@@ -19,30 +19,30 @@ export function ScanReview() {
     <div className="flex flex-col h-full bg-white">
       <div className="flex-1 overflow-auto pb-[168px]">
         {/* Header */}
-        <div className="px-4 pt-4 pb-3 border-b border-[#e0e0e0] mt-4">
+        <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd] mt-4">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-[#161616] text-[20px]" style={{ fontWeight: 600 }}>Review Photos</h1>
+            <h1 className="text-[#100d09] text-[20px]" style={{ fontWeight: 600 }}>Review Photos</h1>
             <button 
               onClick={() => nav("/scan")}
               className="w-8 h-8 rounded-full flex items-center justify-center"
             >
-              <X size={20} className="text-[#161616]" />
+              <X size={20} className="text-[#100d09]" />
             </button>
           </div>
-          <p className="text-[#525252] text-[13px]">{photos.length} photo{photos.length !== 1 ? 's' : ''} selected</p>
+          <p className="text-[#423424] text-[13px]">{photos.length} photo{photos.length !== 1 ? 's' : ''} selected</p>
         </div>
 
         {/* Photo grid - 2 per row or empty state */}
         {photos.length === 0 ? (
           <div className="px-4 pt-12 pb-6 flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 rounded-full bg-[#F4F4F4] flex items-center justify-center mb-4">
-              <X size={32} className="text-[#8d8d8d]" />
+            <div className="w-20 h-20 rounded-full bg-[#fcf5e9] flex items-center justify-center mb-4">
+              <X size={32} className="text-[#a4825b]" />
             </div>
-            <h3 className="text-[#161616] text-[16px] mb-2" style={{ fontWeight: 600 }}>No Photos</h3>
-            <p className="text-[#525252] text-[14px] mb-6 max-w-[280px]">All photos have been removed. Return to camera to add new photos.</p>
+            <h3 className="text-[#100d09] text-[16px] mb-2" style={{ fontWeight: 600 }}>No Photos</h3>
+            <p className="text-[#423424] text-[14px] mb-6 max-w-[280px]">All photos have been removed. Return to camera to add new photos.</p>
             <button
               onClick={() => nav("/scan")}
-              className="px-6 py-3 rounded-lg bg-[#0F62FE] text-white text-[15px] active:scale-95 transition-transform"
+              className="px-6 py-3 rounded-lg bg-[#525a3f] text-white text-[15px] active:scale-95 transition-transform"
               style={{ fontWeight: 500 }}
             >
               Back to Camera
@@ -51,7 +51,7 @@ export function ScanReview() {
         ) : (
           <div className="px-4 pt-4 grid grid-cols-2 gap-3 mb-6">
             {photos.map((photo, index) => (
-              <div key={photo} className="relative aspect-[4/3] bg-[#F4F4F4] rounded-lg border border-[#e0e0e0] overflow-hidden">
+              <div key={photo} className="relative aspect-[4/3] bg-[#fcf5e9] rounded-lg border border-[#dbcdbd] overflow-hidden">
                 {/* Actual photo */}
                 <img 
                   src={menuPhoto} 
@@ -61,7 +61,7 @@ export function ScanReview() {
                 {/* X button - top right */}
                 <button 
                   onClick={() => removePhoto(index)}
-                  className="absolute top-2 right-2 w-7 h-7 bg-[#161616]/80 rounded-full flex items-center justify-center hover:bg-[#161616] transition-colors"
+                  className="absolute top-2 right-2 w-7 h-7 bg-[#100d09]/80 rounded-full flex items-center justify-center hover:bg-[#100d09] transition-colors"
                 >
                   <X size={16} className="text-white" />
                 </button>
@@ -77,7 +77,7 @@ export function ScanReview() {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Enter any additional information/needs"
-              className="w-full bg-[#F4F4F4] border border-[#e0e0e0] rounded-lg px-4 py-3 text-[#161616] placeholder:text-[#8d8d8d] text-[14px] outline-none focus:ring-2 focus:ring-[#0F62FE] transition-all resize-none"
+              className="w-full bg-[#fcf5e9] border border-[#dbcdbd] rounded-lg px-4 py-3 text-[#100d09] placeholder:text-[#a4825b] text-[14px] outline-none focus:ring-2 focus:ring-[#525a3f] transition-all resize-none"
               rows={3}
             />
           </div>
@@ -86,10 +86,10 @@ export function ScanReview() {
 
       {/* Fixed bottom section with Analyze button - only show if photos exist */}
       {photos.length > 0 && (
-        <div className="fixed bottom-[60px] inset-x-0 bg-white border-t border-[#e0e0e0] px-4 py-3">
+        <div className="fixed bottom-[60px] inset-x-0 bg-white border-t border-[#dbcdbd] px-4 py-3">
           <button
             onClick={() => nav("/scan/results")}
-            className="w-full py-3 rounded-lg bg-[#0F62FE] flex items-center justify-center text-white text-[15px] active:scale-95 transition-transform"
+            className="w-full py-3 rounded-lg bg-[#525a3f] flex items-center justify-center text-white text-[15px] active:scale-95 transition-transform"
             style={{ fontWeight: 500 }}
           >
             Analyze ({photos.length})

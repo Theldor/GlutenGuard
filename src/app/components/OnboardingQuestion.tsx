@@ -119,7 +119,7 @@ export function OnboardingQuestion() {
       {/* Back button */}
       <button
         onClick={back}
-        className="flex items-center gap-2 text-[#0F62FE] mb-4 -ml-2 p-2"
+        className="flex items-center gap-2 text-[#525a3f] mb-4 -ml-2 p-2"
       >
         <ArrowLeft size={20} />
         <span>Back</span>
@@ -130,12 +130,12 @@ export function OnboardingQuestion() {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full ${i <= stepNum ? "bg-[#0F62FE]" : "bg-[#e0e0e0]"}`}
+            className={`h-1 flex-1 rounded-full ${i <= stepNum ? "bg-[#525a3f]" : "bg-[#dbcdbd]"}`}
           />
         ))}
       </div>
-      <p className="text-[#6f6f6f] mb-1">Step {stepNum + 1} of 4</p>
-      <h2 className="text-[#161616] mb-6">{adjustedQuestion}</h2>
+      <p className="text-[#846848] mb-1">Step {stepNum + 1} of 4</p>
+      <h2 className="text-[#100d09] mb-6">{adjustedQuestion}</h2>
 
       <div className="flex-1 overflow-auto flex flex-col gap-2">
         {data.type === "checkbox" && data.options?.map((opt, i) => {
@@ -154,14 +154,14 @@ export function OnboardingQuestion() {
               }}
               className={`text-left p-4 rounded-lg border transition-all ${
                 isSelected
-                  ? "border-[#0F62FE] bg-[#EDF5FF]"
-                  : "border-[#e0e0e0] bg-white"
+                  ? "border-[#525a3f] bg-[#f3f5f0]"
+                  : "border-[#dbcdbd] bg-white"
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 ${
-                    isSelected ? "border-[#0F62FE] bg-[#0F62FE]" : "border-[#a8a8a8]"
+                    isSelected ? "border-[#525a3f] bg-[#525a3f]" : "border-[#b79b7b]"
                   }`}
                 >
                   {isSelected && (
@@ -171,8 +171,8 @@ export function OnboardingQuestion() {
                   )}
                 </div>
                 <div>
-                  <p className="text-[#161616]">{opt.title}</p>
-                  {opt.sub && <p className="text-[13px] text-[#6f6f6f] mt-0.5">{opt.sub}</p>}
+                  <p className="text-[#100d09]">{opt.title}</p>
+                  {opt.sub && <p className="text-[13px] text-[#846848] mt-0.5">{opt.sub}</p>}
                 </div>
               </div>
             </button>
@@ -192,21 +192,21 @@ export function OnboardingQuestion() {
             }}
             className={`text-left p-4 rounded-lg border transition-all ${
               selected === i
-                ? "border-[#0F62FE] bg-[#EDF5FF]"
-                : "border-[#e0e0e0] bg-white"
+                ? "border-[#525a3f] bg-[#f3f5f0]"
+                : "border-[#dbcdbd] bg-white"
             }`}
           >
             <div className="flex items-center gap-3">
               <div
                 className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                  selected === i ? "border-[#0F62FE]" : "border-[#a8a8a8]"
+                  selected === i ? "border-[#525a3f]" : "border-[#b79b7b]"
                 }`}
               >
-                {selected === i && <div className="w-2.5 h-2.5 rounded-full bg-[#0F62FE]" />}
+                {selected === i && <div className="w-2.5 h-2.5 rounded-full bg-[#525a3f]" />}
               </div>
               <div>
-                <p className="text-[#161616]">{opt.title}</p>
-                {opt.sub && <p className="text-[13px] text-[#6f6f6f] mt-0.5">{opt.sub}</p>}
+                <p className="text-[#100d09]">{opt.title}</p>
+                {opt.sub && <p className="text-[13px] text-[#846848] mt-0.5">{opt.sub}</p>}
               </div>
             </div>
           </button>
@@ -217,7 +217,7 @@ export function OnboardingQuestion() {
             <select
               value={profile.condition}
               onChange={(e) => setProfile({ condition: e.target.value })}
-              className="w-full p-4 rounded-lg border border-[#e0e0e0] bg-white text-[#161616] focus:border-[#0F62FE] focus:outline-none"
+              className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] focus:border-[#525a3f] focus:outline-none"
             >
               <option value="">Select a condition...</option>
               {medicalConditions.map((condition) => (
@@ -231,13 +231,13 @@ export function OnboardingQuestion() {
 
         {data.textInputKey && (
           <div className="mt-4">
-            <label className="block text-[#525252] text-[14px] mb-2">
+            <label className="block text-[#423424] text-[14px] mb-2">
               {data.textInputLabel}
             </label>
             <textarea
               value={textValue}
               onChange={(e) => setProfile({ [data.textInputKey]: e.target.value })}
-              className="w-full p-4 rounded-lg border border-[#e0e0e0] bg-white text-[#161616] focus:border-[#0F62FE] focus:outline-none min-h-[100px] resize-none"
+              className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] focus:border-[#525a3f] focus:outline-none min-h-[100px] resize-none"
               placeholder="Optional"
             />
           </div>
@@ -248,11 +248,11 @@ export function OnboardingQuestion() {
         <button
           onClick={next}
           disabled={!canContinue}
-          className="w-full py-3.5 bg-[#0F62FE] text-white rounded-lg disabled:opacity-40"
+          className="w-full py-3.5 bg-[#525a3f] text-white rounded-lg disabled:opacity-40"
         >
           Continue
         </button>
-        <button onClick={next} className="w-full py-3 text-[#0F62FE] bg-transparent">
+        <button onClick={next} className="w-full py-3 text-[#525a3f] bg-transparent">
           Skip
         </button>
       </div>

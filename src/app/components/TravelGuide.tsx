@@ -152,23 +152,23 @@ export function TravelGuide() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F4F4F4]">
+    <div className="flex flex-col h-full bg-[#fcf5e9]">
       <div className="flex-1 overflow-auto bg-white">
         
         {view === 'list' && (
           <div className="p-4">
-            <h1 className="text-[24px] font-semibold text-[#161616] mb-6 mt-4">My Trips</h1>
+            <h1 className="text-[24px] font-semibold text-[#100d09] mb-6 mt-4">My Trips</h1>
             
             <button 
               onClick={() => setView('create')}
-              className="w-full flex items-center justify-between bg-[#0F62FE] text-white p-4 rounded-md mb-6 active:bg-[#0353E9]"
+              className="w-full flex items-center justify-between bg-[#525a3f] text-white p-4 rounded-md mb-6 active:bg-[#373c2a]"
             >
               <span className="font-medium text-[16px]">Create New Trip</span>
               <Plus size={20} />
             </button>
 
             <div className="space-y-4">
-              <h2 className="text-[14px] font-medium text-[#525252] uppercase tracking-wider mb-2">Upcoming & Saved</h2>
+              <h2 className="text-[14px] font-medium text-[#423424] uppercase tracking-wider mb-2">Upcoming & Saved</h2>
               {trips.map(trip => (
                 <div 
                   key={trip.id} 
@@ -220,13 +220,13 @@ export function TravelGuide() {
                           className="fixed inset-0 z-20" 
                           onClick={() => setMenuOpenId(null)}
                         />
-                        <div className="absolute bottom-full right-0 mb-2 bg-white rounded-lg shadow-xl border border-[#E0E0E0] overflow-hidden z-30 min-w-[160px]">
+                        <div className="absolute bottom-full right-0 mb-2 bg-white rounded-lg shadow-xl border border-[#dbcdbd] overflow-hidden z-30 min-w-[160px]">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEditTrip(trip);
                             }}
-                            className="w-full flex items-center gap-2 px-4 py-3 text-[14px] text-[#161616] hover:bg-[#F4F4F4] transition-colors"
+                            className="w-full flex items-center gap-2 px-4 py-3 text-[14px] text-[#100d09] hover:bg-[#fcf5e9] transition-colors"
                           >
                             <Pencil size={14} />
                             Edit trip info
@@ -236,7 +236,7 @@ export function TravelGuide() {
                               e.stopPropagation();
                               handleDeleteTrip(trip.id);
                             }}
-                            className="w-full flex items-center gap-2 px-4 py-3 text-[14px] text-[#DA1E28] hover:bg-[#FFF1F1] transition-colors border-t border-[#E0E0E0]"
+                            className="w-full flex items-center gap-2 px-4 py-3 text-[14px] text-[#DA1E28] hover:bg-[#FFF1F1] transition-colors border-t border-[#dbcdbd]"
                           >
                             <Trash2 size={14} />
                             Delete trip
@@ -261,62 +261,62 @@ export function TravelGuide() {
                 setTripLocation("");
                 setTripStartDate("");
                 setTripEndDate("");
-              }} className="text-[#161616] p-2 -ml-2 rounded-full hover:bg-[#F4F4F4]">
+              }} className="text-[#100d09] p-2 -ml-2 rounded-full hover:bg-[#fcf5e9]">
                 <ArrowLeft size={24} />
               </button>
-              <h1 className="text-[20px] font-semibold text-[#161616]">
+              <h1 className="text-[20px] font-semibold text-[#100d09]">
                 {view === 'edit' ? 'Edit Trip' : 'Plan a New Trip'}
               </h1>
             </div>
 
             <div className="space-y-6 flex-1">
               <div>
-                <label className="block text-[14px] font-medium text-[#161616] mb-2">Trip Name</label>
+                <label className="block text-[14px] font-medium text-[#100d09] mb-2">Trip Name</label>
                 <input 
                   type="text" 
                   placeholder="e.g. Summer in Paris"
                   value={tripName}
                   onChange={(e) => setTripName(e.target.value)}
-                  className="w-full p-4 bg-[#F4F4F4] border-b-2 border-transparent focus:border-[#0F62FE] outline-none text-[16px] text-[#161616]"
+                  className="w-full p-4 bg-[#fcf5e9] border-b-2 border-transparent focus:border-[#525a3f] outline-none text-[16px] text-[#100d09]"
                 />
               </div>
 
               <div>
-                <label className="block text-[14px] font-medium text-[#161616] mb-2">Location</label>
+                <label className="block text-[14px] font-medium text-[#100d09] mb-2">Location</label>
                 <div className="relative">
-                  <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#525252]" />
+                  <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#423424]" />
                   <input 
                     type="text" 
                     placeholder="Search city, region, or country"
                     value={tripLocation}
                     onChange={(e) => setTripLocation(e.target.value)}
-                    className="w-full pl-11 pr-4 py-4 bg-[#F4F4F4] border-b-2 border-transparent focus:border-[#0F62FE] outline-none text-[16px] text-[#161616]"
+                    className="w-full pl-11 pr-4 py-4 bg-[#fcf5e9] border-b-2 border-transparent focus:border-[#525a3f] outline-none text-[16px] text-[#100d09]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[14px] font-medium text-[#161616] mb-2">
-                  Dates <span className="text-[#8D8D8D] font-normal">(Optional)</span>
+                <label className="block text-[14px] font-medium text-[#100d09] mb-2">
+                  Dates <span className="text-[#a4825b] font-normal">(Optional)</span>
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[12px] text-[#525252] mb-1">Start Date</label>
+                    <label className="block text-[12px] text-[#423424] mb-1">Start Date</label>
                     <input 
                       type="date"
                       value={tripStartDate}
                       onChange={(e) => setTripStartDate(e.target.value)}
-                      className="w-full p-3 bg-[#F4F4F4] border-b-2 border-transparent focus:border-[#0F62FE] outline-none text-[14px] text-[#161616]"
+                      className="w-full p-3 bg-[#fcf5e9] border-b-2 border-transparent focus:border-[#525a3f] outline-none text-[14px] text-[#100d09]"
                     />
                   </div>
                   <div>
-                    <label className="block text-[12px] text-[#525252] mb-1">End Date</label>
+                    <label className="block text-[12px] text-[#423424] mb-1">End Date</label>
                     <input 
                       type="date"
                       value={tripEndDate}
                       onChange={(e) => setTripEndDate(e.target.value)}
                       min={tripStartDate}
-                      className="w-full p-3 bg-[#F4F4F4] border-b-2 border-transparent focus:border-[#0F62FE] outline-none text-[14px] text-[#161616]"
+                      className="w-full p-3 bg-[#fcf5e9] border-b-2 border-transparent focus:border-[#525a3f] outline-none text-[14px] text-[#100d09]"
                     />
                   </div>
                 </div>
@@ -326,7 +326,7 @@ export function TravelGuide() {
             <button 
               onClick={view === 'edit' ? handleUpdateTrip : handleCreateTrip}
               disabled={!tripName || !tripLocation}
-              className="w-full bg-[#0F62FE] text-white p-4 rounded-md font-medium text-[16px] mt-auto disabled:bg-[#C6C6C6] disabled:text-[#8D8D8D]"
+              className="w-full bg-[#525a3f] text-white p-4 rounded-md font-medium text-[16px] mt-auto disabled:bg-[#c9b49c] disabled:text-[#a4825b]"
             >
               {view === 'edit' ? 'Save Changes' : 'Create Trip'}
             </button>
@@ -361,11 +361,11 @@ export function TravelGuide() {
 
             <div className="p-4 space-y-6">
               {/* Warnings / Tips */}
-              <div className="bg-[#FFF8E1] border-l-4 border-[#F1C21B] p-4 rounded-r-md flex gap-3">
-                <Info className="text-[#8E6A00] shrink-0 mt-0.5" size={18} />
+              <div className="bg-[#fef4cd] border-l-4 border-[#fac905] p-4 rounded-r-md flex gap-3">
+                <Info className="text-[#967903] shrink-0 mt-0.5" size={18} />
                 <div>
-                  <h4 className="text-[14px] font-semibold text-[#8E6A00] mb-1">Local Dining Tip</h4>
-                  <p className="text-[13px] text-[#8E6A00] leading-relaxed">
+                  <h4 className="text-[14px] font-semibold text-[#967903] mb-1">Local Dining Tip</h4>
+                  <p className="text-[13px] text-[#967903] leading-relaxed">
                     Always confirm cross-contamination protocols, even at trusted places in {activeTrip.location.split(',')[0]}.
                   </p>
                 </div>
@@ -374,22 +374,22 @@ export function TravelGuide() {
               {/* Saved Restaurants */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[16px] font-semibold text-[#161616]">Saved Places</h3>
-                  <span className="text-[13px] text-[#525252] bg-[#F4F4F4] px-2 py-1 rounded-full">
+                  <h3 className="text-[16px] font-semibold text-[#100d09]">Saved Places</h3>
+                  <span className="text-[13px] text-[#423424] bg-[#fcf5e9] px-2 py-1 rounded-full">
                     {activeTrip.restaurants.length}
                   </span>
                 </div>
                 
                 {activeTrip.restaurants.length === 0 ? (
-                  <div className="bg-[#F4F4F4] p-6 rounded-lg text-center border border-dashed border-[#C6C6C6]">
-                    <div className="bg-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 text-[#525252]">
+                  <div className="bg-[#fcf5e9] p-6 rounded-lg text-center border border-dashed border-[#c9b49c]">
+                    <div className="bg-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3 text-[#423424]">
                       <Search size={20} />
                     </div>
-                    <p className="text-[14px] text-[#161616] font-medium mb-1">No places added yet</p>
-                    <p className="text-[13px] text-[#525252] mb-4">Start discovering safe spots in {activeTrip.location}.</p>
+                    <p className="text-[14px] text-[#100d09] font-medium mb-1">No places added yet</p>
+                    <p className="text-[13px] text-[#423424] mb-4">Start discovering safe spots in {activeTrip.location}.</p>
                     <button 
                       onClick={() => setView('search')}
-                      className="text-[#0F62FE] text-[14px] font-medium inline-flex items-center gap-1"
+                      className="text-[#525a3f] text-[14px] font-medium inline-flex items-center gap-1"
                     >
                       Search now <ArrowRight size={16} />
                     </button>
@@ -397,26 +397,26 @@ export function TravelGuide() {
                 ) : (
                   <div className="space-y-3">
                     {activeTrip.restaurants.map(rest => (
-                      <div key={rest.id} className="bg-white border border-[#E0E0E0] p-4 rounded-lg shadow-sm">
+                      <div key={rest.id} className="bg-white border border-[#dbcdbd] p-4 rounded-lg shadow-sm">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <h4 className="text-[16px] font-medium text-[#161616]">{rest.name}</h4>
-                            <p className="text-[13px] text-[#525252]">{rest.cuisine}</p>
+                            <h4 className="text-[16px] font-medium text-[#100d09]">{rest.name}</h4>
+                            <p className="text-[13px] text-[#423424]">{rest.cuisine}</p>
                           </div>
                           {rest.riskLevel === 'safe' ? (
-                            <span className="bg-[#DEFBE6] text-[#198038] text-[12px] font-medium px-2 py-1 rounded-md">Trusted</span>
+                            <span className="bg-[#e7eae1] text-[#6d7854] text-[12px] font-medium px-2 py-1 rounded-md">Trusted</span>
                           ) : (
-                            <span className="bg-[#FFF8E1] text-[#8E6A00] text-[12px] font-medium px-2 py-1 rounded-md">Caution</span>
+                            <span className="bg-[#fef4cd] text-[#967903] text-[12px] font-medium px-2 py-1 rounded-md">Caution</span>
                           )}
                         </div>
-                        <p className="text-[13px] text-[#525252] bg-[#F4F4F4] p-2 rounded mt-2 inline-block w-full">
+                        <p className="text-[13px] text-[#423424] bg-[#fcf5e9] p-2 rounded mt-2 inline-block w-full">
                           {rest.notes}
                         </p>
                       </div>
                     ))}
                     <button 
                       onClick={() => setView('search')}
-                      className="w-full py-3 mt-2 border-2 border-dashed border-[#0F62FE] text-[#0F62FE] rounded-lg font-medium text-[14px] flex items-center justify-center gap-2 hover:bg-[#0F62FE]/5"
+                      className="w-full py-3 mt-2 border-2 border-dashed border-[#525a3f] text-[#525a3f] rounded-lg font-medium text-[14px] flex items-center justify-center gap-2 hover:bg-[#525a3f]/5"
                     >
                       <Plus size={18} /> Add More Places
                     </button>
@@ -428,38 +428,38 @@ export function TravelGuide() {
         )}
 
         {view === 'search' && activeTrip && (
-          <div className="flex flex-col h-full bg-[#F4F4F4]">
+          <div className="flex flex-col h-full bg-[#fcf5e9]">
             <div className="bg-white px-4 py-4 shadow-sm z-10">
               <div className="flex items-center gap-3 mb-4">
-                <button onClick={() => setView('detail')} className="text-[#161616] p-1 -ml-1 rounded hover:bg-[#F4F4F4]">
+                <button onClick={() => setView('detail')} className="text-[#100d09] p-1 -ml-1 rounded hover:bg-[#fcf5e9]">
                   <ArrowLeft size={24} />
                 </button>
-                <h2 className="text-[16px] font-medium text-[#161616]">Search in {activeTrip.location.split(',')[0]}</h2>
+                <h2 className="text-[16px] font-medium text-[#100d09]">Search in {activeTrip.location.split(',')[0]}</h2>
               </div>
               <div className="relative">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#525252]" />
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#423424]" />
                 <input 
                   type="text" 
                   autoFocus
                   placeholder="Find restaurants, cafes..."
-                  className="w-full pl-10 pr-4 py-3 bg-[#F4F4F4] rounded-md outline-none text-[15px] border border-transparent focus:border-[#0F62FE]"
+                  className="w-full pl-10 pr-4 py-3 bg-[#fcf5e9] rounded-md outline-none text-[15px] border border-transparent focus:border-[#525a3f]"
                 />
               </div>
             </div>
 
             <div className="flex-1 p-4 overflow-auto space-y-3">
-              <p className="text-[13px] text-[#525252] font-medium mb-1 uppercase tracking-wider">Suggested Spots</p>
+              <p className="text-[13px] text-[#423424] font-medium mb-1 uppercase tracking-wider">Suggested Spots</p>
               {MOCK_SEARCH_RESULTS.map(result => {
                 const isAdded = activeTrip.restaurants.some(r => r.id === result.id);
                 return (
-                  <div key={result.id} className="bg-white p-4 rounded-lg flex items-center justify-between border border-[#E0E0E0]">
+                  <div key={result.id} className="bg-white p-4 rounded-lg flex items-center justify-between border border-[#dbcdbd]">
                     <div className="flex-1 pr-3">
-                      <h4 className="text-[15px] font-medium text-[#161616]">{result.name}</h4>
-                      <p className="text-[13px] text-[#525252]">{result.cuisine}</p>
+                      <h4 className="text-[15px] font-medium text-[#100d09]">{result.name}</h4>
+                      <p className="text-[13px] text-[#423424]">{result.cuisine}</p>
                       {result.riskLevel === 'safe' ? (
-                        <span className="inline-block mt-2 text-[#198038] text-[12px] font-medium">✓ Trusted Option</span>
+                        <span className="inline-block mt-2 text-[#6d7854] text-[12px] font-medium">✓ Trusted Option</span>
                       ) : (
-                        <span className="inline-block mt-2 text-[#8E6A00] text-[12px] font-medium">⚠ Exercise Caution</span>
+                        <span className="inline-block mt-2 text-[#967903] text-[12px] font-medium">⚠ Exercise Caution</span>
                       )}
                     </div>
                     <button 
@@ -467,8 +467,8 @@ export function TravelGuide() {
                       disabled={isAdded}
                       className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                         isAdded 
-                          ? 'bg-[#DEFBE6] text-[#198038]' 
-                          : 'bg-[#0F62FE] text-white hover:bg-[#0353E9]'
+                          ? 'bg-[#e7eae1] text-[#6d7854]' 
+                          : 'bg-[#525a3f] text-white hover:bg-[#373c2a]'
                       }`}
                     >
                       {isAdded ? <Check size={16} /> : <Plus size={18} />}

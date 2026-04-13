@@ -34,9 +34,9 @@ const MOCK_BOOKMARKED_RESTAURANTS = [
 ];
 
 const badgeConfig: Record<string, { bg: string; fg: string; label: string }> = {
-  green: { bg: "#DEFBE6", fg: "#198038", label: "Celiac-Appropriate" },
-  yellow: { bg: "#FFF8E1", fg: "#8E6A00", label: "GF Menu Available" },
-  gray: { bg: "#F4F4F4", fg: "#6f6f6f", label: "Not Rated" },
+  green: { bg: "#e7eae1", fg: "#6d7854", label: "Celiac-Appropriate" },
+  yellow: { bg: "#fef4cd", fg: "#967903", label: "GF Menu Available" },
+  gray: { bg: "#fcf5e9", fg: "#846848", label: "Not Rated" },
 };
 
 export function Bookmarks() {
@@ -48,12 +48,12 @@ export function Bookmarks() {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 border-b border-[#e0e0e0]">
+      <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd]">
         <div className="flex items-center gap-3 mb-2">
           <button onClick={() => nav("/explore")} className="flex items-center justify-center w-8 h-8">
             <ArrowLeft size={20} />
           </button>
-          <h2 className="text-[20px] font-semibold text-[#161616]">Bookmarked Restaurants</h2>
+          <h2 className="text-[20px] font-semibold text-[#100d09]">Bookmarked Restaurants</h2>
         </div>
       </div>
 
@@ -75,12 +75,12 @@ export function Bookmarks() {
                 {/* Overlay badges */}
                 <div className="absolute top-3 left-3 flex gap-1.5">
                   {r.type === "green" && (
-                    <span className="px-2 py-1 rounded-md text-[11px] bg-[#198038] text-white" style={{ fontWeight: 500 }}>
+                    <span className="px-2 py-1 rounded-md text-[11px] bg-[#6d7854] text-white" style={{ fontWeight: 500 }}>
                       ✓ Celiac-Appropriate
                     </span>
                   )}
                   {r.type === "yellow" && (
-                    <span className="px-2 py-1 rounded-md text-[11px] bg-[#8E6A00] text-white" style={{ fontWeight: 500 }}>
+                    <span className="px-2 py-1 rounded-md text-[11px] bg-[#967903] text-white" style={{ fontWeight: 500 }}>
                       GF Menu Available
                     </span>
                   )}
@@ -92,31 +92,31 @@ export function Bookmarks() {
                   >
                     <Bookmark
                       size={16}
-                      className="text-[#0F62FE] fill-[#0F62FE]"
+                      className="text-[#525a3f] fill-[#525a3f]"
                     />
                   </button>
                 </div>
               </div>
               <div className="pb-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-[#161616] text-[15px]" style={{ fontWeight: 600 }}>{r.name}</p>
-                  <div className="flex items-center gap-1 bg-[#F4F4F4] rounded-md px-1.5 py-0.5">
-                    <Star size={12} className="text-[#F1C21B] fill-[#F1C21B]" />
-                    <span className="text-[13px] text-[#161616]" style={{ fontWeight: 500 }}>{r.rating.toFixed(1)}</span>
-                    <span className="text-[11px] text-[#6f6f6f]">({r.reviews})</span>
+                  <p className="text-[#100d09] text-[15px]" style={{ fontWeight: 600 }}>{r.name}</p>
+                  <div className="flex items-center gap-1 bg-[#fcf5e9] rounded-md px-1.5 py-0.5">
+                    <Star size={12} className="text-[#fac905] fill-[#fac905]" />
+                    <span className="text-[13px] text-[#100d09]" style={{ fontWeight: 500 }}>{r.rating.toFixed(1)}</span>
+                    <span className="text-[11px] text-[#846848]">({r.reviews})</span>
                   </div>
                 </div>
-                <p className="text-[13px] text-[#6f6f6f] mt-0.5">
+                <p className="text-[13px] text-[#846848] mt-0.5">
                   {r.cuisine} · {r.priceLevel} · {r.dist}
                 </p>
                 <div className="flex gap-1.5 mt-2 flex-wrap">
                   {r.tags.map((t) => (
-                    <span key={t} className="px-2 py-0.5 rounded text-[11px] bg-[#DEFBE6] text-[#198038]">
+                    <span key={t} className="px-2 py-0.5 rounded text-[11px] bg-[#e7eae1] text-[#6d7854]">
                       {t}
                     </span>
                   ))}
                   {r.safeItems > 0 && (
-                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#EDF5FF] text-[#0F62FE]">
+                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#f3f5f0] text-[#525a3f]">
                       {r.safeItems} safe items
                     </span>
                   )}
@@ -128,16 +128,16 @@ export function Bookmarks() {
       ) : (
         /* ==================== EMPTY STATE ==================== */
         <div className="flex-1 flex flex-col items-center justify-center px-8 pb-24">
-          <div className="w-20 h-20 rounded-full bg-[#F4F4F4] flex items-center justify-center mb-4">
-            <Bookmark size={32} className="text-[#a8a8a8]" />
+          <div className="w-20 h-20 rounded-full bg-[#fcf5e9] flex items-center justify-center mb-4">
+            <Bookmark size={32} className="text-[#b79b7b]" />
           </div>
-          <h3 className="text-[18px] font-semibold text-[#161616] mb-2">No bookmarks yet</h3>
-          <p className="text-[14px] text-[#6f6f6f] text-center mb-6">
+          <h3 className="text-[18px] font-semibold text-[#100d09] mb-2">No bookmarks yet</h3>
+          <p className="text-[14px] text-[#846848] text-center mb-6">
             Start bookmarking restaurants you want to visit by tapping the bookmark icon on restaurant cards.
           </p>
           <button
             onClick={() => nav("/explore")}
-            className="px-6 py-3 bg-[#0F62FE] text-white rounded-lg text-[15px]"
+            className="px-6 py-3 bg-[#525a3f] text-white rounded-lg text-[15px]"
             style={{ fontWeight: 500 }}
           >
             Explore Restaurants

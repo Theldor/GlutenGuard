@@ -142,21 +142,21 @@ export function EditCardPage() {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="px-4 pt-10 pb-4 border-b border-[#e0e0e0]">
+      <div className="px-4 pt-10 pb-4 border-b border-[#dbcdbd]">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-[24px] text-[#161616]" style={{ fontWeight: 600 }}>
+          <h1 className="text-[24px] text-[#100d09]" style={{ fontWeight: 600 }}>
             Edit My Card
           </h1>
           <button onClick={() => nav(-1)}>
             <X size={20} />
           </button>
         </div>
-        <p className="text-[13px] text-[#6f6f6f]">
+        <p className="text-[13px] text-[#846848]">
           Customize which sections appear on your allergy card and how they're displayed
         </p>
         <button
           onClick={() => setShowPreview(!showPreview)}
-          className="mt-3 w-full py-2 bg-[#F4F4F4] text-[#0F62FE] rounded-lg text-[14px] flex items-center justify-center gap-2"
+          className="mt-3 w-full py-2 bg-[#fcf5e9] text-[#525a3f] rounded-lg text-[14px] flex items-center justify-center gap-2"
         >
           <Eye size={16} />
           {showPreview ? "Hide Preview" : "Show Preview"}
@@ -167,16 +167,16 @@ export function EditCardPage() {
       {showLanguageSelector && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
           <div className="bg-white w-full rounded-t-2xl max-h-[70vh] flex flex-col">
-            <div className="px-4 pt-6 pb-4 border-b border-[#e0e0e0]">
+            <div className="px-4 pt-6 pb-4 border-b border-[#dbcdbd]">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-[20px] text-[#161616]" style={{ fontWeight: 600 }}>
+                <h2 className="text-[20px] text-[#100d09]" style={{ fontWeight: 600 }}>
                   Languages I Speak
                 </h2>
                 <button onClick={() => setShowLanguageSelector(false)}>
                   <X size={20} />
                 </button>
               </div>
-              <p className="text-[13px] text-[#6f6f6f]">
+              <p className="text-[13px] text-[#846848]">
                 Select all languages you can communicate in
               </p>
             </div>
@@ -189,13 +189,13 @@ export function EditCardPage() {
                     onClick={() => toggleLanguage(lang)}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-colors ${
                       selectedLanguages.includes(lang)
-                        ? "bg-[#E0E0FF] border-[#0F62FE]"
-                        : "bg-white border-[#e0e0e0]"
+                        ? "bg-[#e7eae1] border-[#525a3f]"
+                        : "bg-white border-[#dbcdbd]"
                     }`}
                   >
-                    <span className="text-[15px] text-[#161616]">{lang}</span>
+                    <span className="text-[15px] text-[#100d09]">{lang}</span>
                     {selectedLanguages.includes(lang) && (
-                      <div className="w-5 h-5 rounded-full bg-[#0F62FE] flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full bg-[#525a3f] flex items-center justify-center">
                         <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
                           <path d="M1 4.5L4.5 8L11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -206,11 +206,11 @@ export function EditCardPage() {
               </div>
             </div>
 
-            <div className="px-4 pb-6 pt-4 border-t border-[#e0e0e0]">
+            <div className="px-4 pb-6 pt-4 border-t border-[#dbcdbd]">
               <button
                 onClick={handleSaveLanguages}
                 disabled={selectedLanguages.length === 0}
-                className="w-full py-3 bg-[#0F62FE] text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-[#525a3f] text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Languages ({selectedLanguages.length})
               </button>
@@ -223,16 +223,16 @@ export function EditCardPage() {
       {showPreview && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-2xl max-h-[85vh] flex flex-col">
-            <div className="px-4 pt-6 pb-4 border-b border-[#e0e0e0]">
+            <div className="px-4 pt-6 pb-4 border-b border-[#dbcdbd]">
               <div className="flex items-center justify-between">
-                <h2 className="text-[20px] text-[#161616]" style={{ fontWeight: 600 }}>
+                <h2 className="text-[20px] text-[#100d09]" style={{ fontWeight: 600 }}>
                   Card Preview
                 </h2>
                 <button onClick={() => setShowPreview(false)}>
                   <X size={20} />
                 </button>
               </div>
-              <p className="text-[13px] text-[#6f6f6f] mt-1">
+              <p className="text-[13px] text-[#846848] mt-1">
                 This is how your card will appear
               </p>
             </div>
@@ -242,18 +242,18 @@ export function EditCardPage() {
                 {sections.filter(s => s.isVisible).map(section => (
                   <div key={section.id}>
                     {section.id === "primary" ? (
-                      <div className="bg-[#F4F4F4] rounded-lg p-4">
+                      <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
-                          className="text-[#161616] leading-relaxed"
+                          className="text-[#100d09] leading-relaxed"
                           style={{ fontSize: `${section.fontSize}px` }}
                         >
                           🔴 {section.content}
                         </p>
                       </div>
                     ) : section.id === "cross-contamination" ? (
-                      <div className="bg-[#F4F4F4] rounded-lg p-4">
+                      <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
-                          className="text-[#161616] leading-relaxed"
+                          className="text-[#100d09] leading-relaxed"
                           style={{ fontSize: `${section.fontSize}px`, fontWeight: 600 }}
                         >
                           🔴 {section.content}
@@ -261,10 +261,10 @@ export function EditCardPage() {
                       </div>
                     ) : section.id === "safe-foods" ? (
                       <div>
-                        <hr className="border-[#e0e0e0] mb-4" />
-                        <div className="bg-[#F4F4F4] rounded-lg p-4">
+                        <hr className="border-[#dbcdbd] mb-4" />
+                        <div className="bg-[#fcf5e9] rounded-lg p-4">
                           <p
-                            className="text-[#161616] leading-relaxed"
+                            className="text-[#100d09] leading-relaxed"
                             style={{ fontSize: `${section.fontSize}px`, fontWeight: 600 }}
                           >
                             🟢 {section.content}
@@ -272,18 +272,18 @@ export function EditCardPage() {
                         </div>
                       </div>
                     ) : section.id === "languages" ? (
-                      <div className="bg-[#F4F4F4] rounded-lg p-4">
+                      <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
-                          className="text-[#161616] leading-relaxed"
+                          className="text-[#100d09] leading-relaxed"
                           style={{ fontSize: `${section.fontSize}px` }}
                         >
                           <span style={{ fontWeight: 600 }}>Languages I speak:</span> {section.content}
                         </p>
                       </div>
                     ) : (
-                      <div className="bg-[#F4F4F4] rounded-lg p-4">
+                      <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
-                          className="text-[#161616] leading-relaxed"
+                          className="text-[#100d09] leading-relaxed"
                           style={{ fontSize: `${section.fontSize}px` }}
                         >
                           {section.content}
@@ -295,10 +295,10 @@ export function EditCardPage() {
               </div>
             </div>
 
-            <div className="px-4 pb-6 pt-4 border-t border-[#e0e0e0]">
+            <div className="px-4 pb-6 pt-4 border-t border-[#dbcdbd]">
               <button
                 onClick={() => setShowPreview(false)}
-                className="w-full py-3 bg-[#0F62FE] text-white rounded-lg"
+                className="w-full py-3 bg-[#525a3f] text-white rounded-lg"
               >
                 Close Preview
               </button>
@@ -314,17 +314,17 @@ export function EditCardPage() {
             <div
               key={section.id}
               className={`border rounded-lg ${
-                section.isVisible ? "border-[#e0e0e0] bg-white" : "border-[#c6c6c6] bg-[#f4f4f4]"
+                section.isVisible ? "border-[#dbcdbd] bg-white" : "border-[#c9b49c] bg-[#fcf5e9]"
               }`}
             >
               {/* Section Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#e0e0e0]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#dbcdbd]">
                 <div className="flex items-center gap-2 flex-1">
-                  <span className="text-[14px] text-[#525252]" style={{ fontWeight: 600 }}>
+                  <span className="text-[14px] text-[#423424]" style={{ fontWeight: 600 }}>
                     {section.label}
                   </span>
                   {!section.isVisible && (
-                    <span className="text-[12px] text-[#6f6f6f] bg-[#e0e0e0] px-2 py-0.5 rounded">
+                    <span className="text-[12px] text-[#846848] bg-[#dbcdbd] px-2 py-0.5 rounded">
                       Hidden
                     </span>
                   )}
@@ -332,18 +332,18 @@ export function EditCardPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleToggleVisibility(section.id)}
-                    className="p-1.5 hover:bg-[#f4f4f4] rounded"
+                    className="p-1.5 hover:bg-[#fcf5e9] rounded"
                   >
                     {section.isVisible ? (
-                      <Eye size={16} className="text-[#525252]" />
+                      <Eye size={16} className="text-[#423424]" />
                     ) : (
-                      <EyeOff size={16} className="text-[#8d8d8d]" />
+                      <EyeOff size={16} className="text-[#a4825b]" />
                     )}
                   </button>
                   {section.id !== "languages" && section.id !== "primary" && (
                     <button
                       onClick={() => handleDeleteSection(section.id)}
-                      className="p-1.5 hover:bg-[#f4f4f4] rounded"
+                      className="p-1.5 hover:bg-[#fcf5e9] rounded"
                     >
                       <Trash2 size={16} className="text-[#DA1E28]" />
                     </button>
@@ -356,12 +356,12 @@ export function EditCardPage() {
                 {/* Special handling for Languages section */}
                 {section.id === "languages" ? (
                   <div>
-                    <p className="text-[16px] text-[#161616] mb-3">
+                    <p className="text-[16px] text-[#100d09] mb-3">
                       {section.content}
                     </p>
                     <button
                       onClick={() => setShowLanguageSelector(true)}
-                      className="flex items-center gap-1.5 text-[14px] text-[#0F62FE]"
+                      className="flex items-center gap-1.5 text-[14px] text-[#525a3f]"
                     >
                       <Edit2 size={14} /> Edit languages
                     </button>
@@ -372,19 +372,19 @@ export function EditCardPage() {
                     <textarea
                       value={editingContent}
                       onChange={(e) => setEditingContent(e.target.value)}
-                      className="w-full min-h-[120px] p-3 border border-[#e0e0e0] rounded-lg text-[16px] text-[#161616] resize-y"
+                      className="w-full min-h-[120px] p-3 border border-[#dbcdbd] rounded-lg text-[16px] text-[#100d09] resize-y"
                       placeholder="Enter content..."
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSaveEdit(section.id)}
-                        className="flex-1 py-2 bg-[#0F62FE] text-white rounded-lg text-[14px]"
+                        className="flex-1 py-2 bg-[#525a3f] text-white rounded-lg text-[14px]"
                       >
                         Save
                       </button>
                       <button
                         onClick={handleCancelEdit}
-                        className="flex-1 py-2 border border-[#e0e0e0] text-[#161616] rounded-lg text-[14px]"
+                        className="flex-1 py-2 border border-[#dbcdbd] text-[#100d09] rounded-lg text-[14px]"
                       >
                         Cancel
                       </button>
@@ -394,7 +394,7 @@ export function EditCardPage() {
                   /* View Mode */
                   <div className="space-y-3">
                     <p
-                      className="text-[#161616] leading-relaxed"
+                      className="text-[#100d09] leading-relaxed"
                       style={{ fontSize: `${section.fontSize}px` }}
                     >
                       {section.content}
@@ -403,19 +403,19 @@ export function EditCardPage() {
                     <div className="flex items-center gap-3 pt-2">
                       {/* Font Size Controls */}
                       <div className="flex items-center gap-2">
-                        <Type size={14} className="text-[#525252]" />
+                        <Type size={14} className="text-[#423424]" />
                         <button
                           onClick={() => handleFontSizeChange(section.id, -2)}
-                          className="w-7 h-7 flex items-center justify-center border border-[#e0e0e0] rounded text-[#161616] hover:bg-[#f4f4f4]"
+                          className="w-7 h-7 flex items-center justify-center border border-[#dbcdbd] rounded text-[#100d09] hover:bg-[#fcf5e9]"
                         >
                           −
                         </button>
-                        <span className="text-[13px] text-[#525252] w-8 text-center">
+                        <span className="text-[13px] text-[#423424] w-8 text-center">
                           {section.fontSize}
                         </span>
                         <button
                           onClick={() => handleFontSizeChange(section.id, 2)}
-                          className="w-7 h-7 flex items-center justify-center border border-[#e0e0e0] rounded text-[#161616] hover:bg-[#f4f4f4]"
+                          className="w-7 h-7 flex items-center justify-center border border-[#dbcdbd] rounded text-[#100d09] hover:bg-[#fcf5e9]"
                         >
                           +
                         </button>
@@ -424,7 +424,7 @@ export function EditCardPage() {
                       {section.isEditable && (
                         <button
                           onClick={() => handleEditSection(section.id, section.content)}
-                          className="ml-auto flex items-center gap-1.5 text-[14px] text-[#0F62FE]"
+                          className="ml-auto flex items-center gap-1.5 text-[14px] text-[#525a3f]"
                         >
                           <Edit2 size={14} /> Edit text
                         </button>
@@ -439,7 +439,7 @@ export function EditCardPage() {
           {/* Add Custom Section Button */}
           <button
             onClick={handleAddCustomSection}
-            className="w-full py-4 border-2 border-dashed border-[#c6c6c6] rounded-lg flex items-center justify-center gap-2 text-[#525252] hover:border-[#0F62FE] hover:text-[#0F62FE] transition-colors"
+            className="w-full py-4 border-2 border-dashed border-[#c9b49c] rounded-lg flex items-center justify-center gap-2 text-[#423424] hover:border-[#525a3f] hover:text-[#525a3f] transition-colors"
           >
             <Plus size={18} />
             <span className="text-[15px]">Add custom section</span>
@@ -448,10 +448,10 @@ export function EditCardPage() {
       </div>
 
       {/* Save Button */}
-      <div className="px-4 pb-6 pt-4 border-t border-[#e0e0e0]">
+      <div className="px-4 pb-6 pt-4 border-t border-[#dbcdbd]">
         <button
           onClick={handleSaveAll}
-          className="w-full py-3 bg-[#0F62FE] text-white rounded-lg"
+          className="w-full py-3 bg-[#525a3f] text-white rounded-lg"
         >
           Save Card Settings
         </button>

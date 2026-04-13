@@ -37,9 +37,9 @@ interface Restaurant {
 }
 
 const badgeConfig: Record<string, { bg: string; fg: string; label: string }> = {
-  green: { bg: "#DEFBE6", fg: "#198038", label: "Celiac-Appropriate" },
-  yellow: { bg: "#FFF8E1", fg: "#8E6A00", label: "GF Menu Available" },
-  gray: { bg: "#F4F4F4", fg: "#6f6f6f", label: "Not Rated" },
+  green: { bg: "#e7eae1", fg: "#6d7854", label: "Celiac-Appropriate" },
+  yellow: { bg: "#fef4cd", fg: "#967903", label: "GF Menu Available" },
+  gray: { bg: "#fcf5e9", fg: "#846848", label: "Not Rated" },
 };
 
 // Mock restaurant data - SF area
@@ -199,9 +199,9 @@ const MOCK_RESTAURANTS: Restaurant[] = [
 ];
 
 const pinColors: Record<string, string> = { 
-  green: "#198038", 
-  yellow: "#F1C21B", 
-  gray: "#a8a8a8" 
+  green: "#6d7854", 
+  yellow: "#fac905", 
+  gray: "#b79b7b" 
 };
 
 export function ExploreMap() {
@@ -370,10 +370,10 @@ export function ExploreMap() {
       <div className="px-4 pt-4 pb-2">
         {/* Header with avatar */}
         <div className="flex items-center justify-between mb-4 mt-4">
-          <h1 className="text-[24px] font-semibold text-[#161616]">Explore nearby</h1>
+          <h1 className="text-[24px] font-semibold text-[#100d09]">Explore nearby</h1>
           <button
             onClick={() => nav("/profile")}
-            className="w-10 h-10 rounded-full bg-[#0F62FE] flex items-center justify-center text-white text-[16px] shrink-0"
+            className="w-10 h-10 rounded-full bg-[#525a3f] flex items-center justify-center text-white text-[16px] shrink-0"
           >
             {profile.name[0]}
           </button>
@@ -381,15 +381,15 @@ export function ExploreMap() {
 
         {/* Search */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1 flex items-center gap-2 bg-[#F4F4F4] rounded-lg px-3 py-2.5">
-            <Search size={16} className="text-[#6f6f6f]" />
+          <div className="flex-1 flex items-center gap-2 bg-[#fcf5e9] rounded-lg px-3 py-2.5">
+            <Search size={16} className="text-[#846848]" />
             <input className="flex-1 bg-transparent outline-none text-[14px]" placeholder="Search restaurants, cuisines..." />
           </div>
           <button
             onClick={() => nav("/explore/bookmarks")}
-            className="bg-[#F4F4F4] rounded-lg p-2.5 flex items-center justify-center shrink-0"
+            className="bg-[#fcf5e9] rounded-lg p-2.5 flex items-center justify-center shrink-0"
           >
-            <Bookmark size={18} className="text-[#525252]" />
+            <Bookmark size={18} className="text-[#423424]" />
           </button>
         </div>
 
@@ -400,7 +400,7 @@ export function ExploreMap() {
               key={f}
               onClick={() => setActiveFilter(i)}
               className={`shrink-0 px-3 py-1.5 rounded-full text-[13px] ${
-                i === activeFilter ? "bg-[#0F62FE] text-white" : "bg-[#F4F4F4] text-[#525252]"
+                i === activeFilter ? "bg-[#525a3f] text-white" : "bg-[#fcf5e9] text-[#423424]"
               }`}
             >
               {f}
@@ -416,8 +416,8 @@ export function ExploreMap() {
               onClick={() => setActiveCuisine(i)}
               className={`shrink-0 px-3 py-1.5 rounded-full text-[13px] border ${
                 i === activeCuisine
-                  ? "border-[#0F62FE] bg-[#EDF5FF] text-[#0F62FE]"
-                  : "border-[#e0e0e0] bg-white text-[#525252]"
+                  ? "border-[#525a3f] bg-[#f3f5f0] text-[#525a3f]"
+                  : "border-[#dbcdbd] bg-white text-[#423424]"
               }`}
             >
               {f}
@@ -434,7 +434,7 @@ export function ExploreMap() {
         // In map view: fixed positioning that doesn't scroll
         <button
           onClick={() => setShowList(!showList)}
-          className="fixed top-[210px] right-4 z-[1001] bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#161616] pointer-events-auto"
+          className="fixed top-[210px] right-4 z-[1001] bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#100d09] pointer-events-auto"
           style={{ fontWeight: 500 }}
         >
           <List size={16} /> List
@@ -449,10 +449,10 @@ export function ExploreMap() {
 
           {/* Restaurant count with toggle button on same line */}
           <div className="px-4 pb-2 flex items-center justify-between">
-            <p className="text-[13px] text-[#6f6f6f]">{filteredRestaurants.length} restaurants</p>
+            <p className="text-[13px] text-[#846848]">{filteredRestaurants.length} restaurants</p>
             <button
               onClick={() => setShowList(false)}
-              className="bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#161616]"
+              className="bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#100d09]"
               style={{ fontWeight: 500 }}
             >
               <MapIcon size={16} /> Map
@@ -478,7 +478,7 @@ export function ExploreMap() {
                       />
                       {/* Overlay badges */}
                       <div className="absolute top-3 left-3 flex gap-1.5">
-                        <span className="px-2 py-1 rounded-md text-[11px] bg-[#198038] text-white" style={{ fontWeight: 500 }}>
+                        <span className="px-2 py-1 rounded-md text-[11px] bg-[#6d7854] text-white" style={{ fontWeight: 500 }}>
                           ✓ Celiac-Appropriate
                         </span>
                       </div>
@@ -489,7 +489,7 @@ export function ExploreMap() {
                         >
                           <Bookmark
                             size={16}
-                            className={saved.has(r._i) ? "text-[#0F62FE] fill-[#0F62FE]" : "text-[#525252]"}
+                            className={saved.has(r._i) ? "text-[#525a3f] fill-[#525a3f]" : "text-[#423424]"}
                           />
                         </button>
                         <button
@@ -498,7 +498,7 @@ export function ExploreMap() {
                         >
                           <Heart
                             size={16}
-                            className={favorites.has(r._i) ? "text-[#DA1E28] fill-[#DA1E28]" : "text-[#525252]"}
+                            className={favorites.has(r._i) ? "text-[#DA1E28] fill-[#DA1E28]" : "text-[#423424]"}
                           />
                         </button>
                       </div>
@@ -513,24 +513,24 @@ export function ExploreMap() {
                     </div>
                     <div className="pt-2.5 pb-1">
                       <div className="flex items-center justify-between">
-                        <p className="text-[#161616] text-[15px]" style={{ fontWeight: 600 }}>{r.name}</p>
-                        <div className="flex items-center gap-1 bg-[#F4F4F4] rounded-md px-1.5 py-0.5">
-                          <Star size={12} className="text-[#F1C21B] fill-[#F1C21B]" />
-                          <span className="text-[13px] text-[#161616]" style={{ fontWeight: 500 }}>{r.rating.toFixed(1)}</span>
-                          <span className="text-[11px] text-[#6f6f6f]">({r.reviews})</span>
+                        <p className="text-[#100d09] text-[15px]" style={{ fontWeight: 600 }}>{r.name}</p>
+                        <div className="flex items-center gap-1 bg-[#fcf5e9] rounded-md px-1.5 py-0.5">
+                          <Star size={12} className="text-[#fac905] fill-[#fac905]" />
+                          <span className="text-[13px] text-[#100d09]" style={{ fontWeight: 500 }}>{r.rating.toFixed(1)}</span>
+                          <span className="text-[11px] text-[#846848]">({r.reviews})</span>
                         </div>
                       </div>
-                      <p className="text-[13px] text-[#6f6f6f] mt-0.5">
+                      <p className="text-[13px] text-[#846848] mt-0.5">
                         {r.cuisine} · {r.priceLevel} · {r.dist}
                       </p>
                       <div className="flex gap-1.5 mt-2">
                         {r.tags.map((t) => (
-                          <span key={t} className="px-2 py-0.5 rounded text-[11px] bg-[#DEFBE6] text-[#198038]">
+                          <span key={t} className="px-2 py-0.5 rounded text-[11px] bg-[#e7eae1] text-[#6d7854]">
                             {t}
                           </span>
                         ))}
                         {r.safeItems > 0 && (
-                          <span className="px-2 py-0.5 rounded text-[11px] bg-[#EDF5FF] text-[#0F62FE]">
+                          <span className="px-2 py-0.5 rounded text-[11px] bg-[#f3f5f0] text-[#525a3f]">
                             {r.safeItems} safe items
                           </span>
                         )}
@@ -549,7 +549,7 @@ export function ExploreMap() {
                 <div
                   key={r.id}
                   onClick={() => nav("/explore/restaurant")}
-                  className="w-full flex gap-3 py-3 border-b border-[#f0f0f0] text-left cursor-pointer"
+                  className="w-full flex gap-3 py-3 border-b border-[#ede6de] text-left cursor-pointer"
                 >
                   <div className="relative shrink-0">
                     <ImageWithFallback
@@ -564,7 +564,7 @@ export function ExploreMap() {
                       >
                         <Bookmark
                           size={12}
-                          className={saved.has(r._i) ? "text-[#0F62FE] fill-[#0F62FE]" : "text-[#6f6f6f]"}
+                          className={saved.has(r._i) ? "text-[#525a3f] fill-[#525a3f]" : "text-[#846848]"}
                         />
                       </div>
                       <div
@@ -573,27 +573,27 @@ export function ExploreMap() {
                       >
                         <Heart
                           size={12}
-                          className={favorites.has(r._i) ? "text-[#DA1E28] fill-[#DA1E28]" : "text-[#6f6f6f]"}
+                          className={favorites.has(r._i) ? "text-[#DA1E28] fill-[#DA1E28]" : "text-[#846848]"}
                         />
                       </div>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0 py-0.5">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-[#161616] text-[15px] truncate" style={{ fontWeight: 600 }}>
+                      <p className="text-[#100d09] text-[15px] truncate" style={{ fontWeight: 600 }}>
                         {r.name}
                       </p>
                       {r.rating > 0 && (
-                        <div className="flex items-center gap-0.5 shrink-0 bg-[#F4F4F4] rounded px-1.5 py-0.5">
-                          <Star size={11} className="text-[#F1C21B] fill-[#F1C21B]" />
-                          <span className="text-[12px] text-[#161616]" style={{ fontWeight: 500 }}>{r.rating.toFixed(1)}</span>
+                        <div className="flex items-center gap-0.5 shrink-0 bg-[#fcf5e9] rounded px-1.5 py-0.5">
+                          <Star size={11} className="text-[#fac905] fill-[#fac905]" />
+                          <span className="text-[12px] text-[#100d09]" style={{ fontWeight: 500 }}>{r.rating.toFixed(1)}</span>
                         </div>
                       )}
                     </div>
-                    <p className="text-[12px] text-[#6f6f6f] mt-0.5">
+                    <p className="text-[12px] text-[#846848] mt-0.5">
                       {r.cuisine} · {r.priceLevel} · {r.dist}
                     </p>
-                    <div className="flex items-center gap-2 mt-1.5 text-[12px] text-[#525252]" style={{ display: "none" }}>
+                    <div className="flex items-center gap-2 mt-1.5 text-[12px] text-[#423424]" style={{ display: "none" }}>
                       <span className="flex items-center gap-0.5">
                         <Clock size={11} /> {r.deliveryTime}
                       </span>
@@ -610,18 +610,18 @@ export function ExploreMap() {
                         </span>
                       )}
                       {r.safeItems > 0 && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#EDF5FF] text-[#0F62FE]">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#f3f5f0] text-[#525a3f]">
                           {r.safeItems} safe items
                         </span>
                       )}
                       {r.type === "gray" && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#F4F4F4] text-[#6f6f6f]">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] bg-[#fcf5e9] text-[#846848]">
                           Not rated yet
                         </span>
                       )}
                     </div>
                   </div>
-                  <ChevronRight size={16} className="text-[#c6c6c6] shrink-0 self-center" />
+                  <ChevronRight size={16} className="text-[#c9b49c] shrink-0 self-center" />
                 </div>
               ))}
           </div>
@@ -718,7 +718,7 @@ export function ExploreMap() {
                     className="w-full h-full rounded-full border-3 border-white shadow-lg transition-all flex items-center justify-center"
                     style={{
                       backgroundColor: pinColors[restaurant.type],
-                      boxShadow: isSelected ? '0 0 0 4px #0F62FE, 0 4px 12px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.3)',
+                      boxShadow: isSelected ? '0 0 0 4px #525a3f, 0 4px 12px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.3)',
                     }}
                   >
                     {isSelected && (
@@ -738,23 +738,23 @@ export function ExploreMap() {
                 className="w-full bg-white rounded-xl p-4 shadow-lg text-left"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-[#161616]" style={{ fontWeight: 600 }}>{pin.name}</p>
+                  <p className="text-[#100d09]" style={{ fontWeight: 600 }}>{pin.name}</p>
                   {pin.type === "green" && (
-                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#DEFBE6] text-[#198038]">Celiac-Appropriate</span>
+                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#e7eae1] text-[#6d7854]">Celiac-Appropriate</span>
                   )}
                   {pin.type === "yellow" && (
-                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#FFF8E1] text-[#8E6A00]">GF Menu Available</span>
+                    <span className="px-2 py-0.5 rounded text-[11px] bg-[#fef4cd] text-[#967903]">GF Menu Available</span>
                   )}
                 </div>
-                <p className="text-[13px] text-[#6f6f6f]">{pin.cuisine} · {pin.dist}</p>
+                <p className="text-[13px] text-[#846848]">{pin.cuisine} · {pin.dist}</p>
                 {pin.reviews > 0 && (
                   <div className="flex items-center gap-1 mt-1">
-                    <Star size={12} className="text-[#F1C21B] fill-[#F1C21B]" />
-                    <span className="text-[13px] text-[#525252]">{pin.rating.toFixed(1)} from {pin.reviews} celiac reviews</span>
+                    <Star size={12} className="text-[#fac905] fill-[#fac905]" />
+                    <span className="text-[13px] text-[#423424]">{pin.rating.toFixed(1)} from {pin.reviews} celiac reviews</span>
                   </div>
                 )}
-                {pin.preview && <p className="text-[13px] text-[#525252] mt-1">{pin.preview}</p>}
-                <p className="text-[13px] text-[#0F62FE] mt-2">View Details →</p>
+                {pin.preview && <p className="text-[13px] text-[#423424] mt-1">{pin.preview}</p>}
+                <p className="text-[13px] text-[#525a3f] mt-2">View Details →</p>
               </button>
             </div>
           )}

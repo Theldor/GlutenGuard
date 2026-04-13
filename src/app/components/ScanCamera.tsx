@@ -118,14 +118,14 @@ export function ScanCamera() {
             {/* Camera button - centered */}
             <button
               onClick={handleTakePhoto}
-              className="w-16 h-16 rounded-full bg-white border-4 border-[#0F62FE] active:scale-95 transition-transform"
+              className="w-16 h-16 rounded-full bg-white border-4 border-[#525a3f] active:scale-95 transition-transform"
             />
             
             {/* Analyze button - right side */}
             {selectedPhotos.length > 0 && (
               <button
                 onClick={() => nav("/scan/review", { state: { photos: selectedPhotos } })}
-                className="absolute right-0 h-12 px-5 rounded-full bg-[#42be65] flex items-center justify-center text-white text-[14px] font-semibold active:scale-95 transition-transform"
+                className="absolute right-0 h-12 px-5 rounded-full bg-[#899669] flex items-center justify-center text-white text-[14px] font-semibold active:scale-95 transition-transform"
               >
                 Analyze ({selectedPhotos.length})
               </button>

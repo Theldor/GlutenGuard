@@ -7,7 +7,7 @@ export default function App() {
     <AppProvider>
       <div
         className="mx-auto h-screen max-w-[430px] bg-white relative overflow-hidden"
-        style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
+        style={{ fontFamily: "'Geist', sans-serif" }}
       >
         <RouterProvider router={router} />
       </div>

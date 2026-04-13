@@ -99,7 +99,7 @@ export function AllergyCard() {
   const t = translations[lang];
   const englishContent = translations.en.content;
   const sev = Math.max(0, profile.crossContamination);
-  const color = ["#DA1E28", "#F1C21B", "#198038", "#a8a8a8"][
+  const color = ["#DA1E28", "#fac905", "#6d7854", "#b79b7b"][
     sev
   ];
 
@@ -133,7 +133,7 @@ export function AllergyCard() {
       {/* Header with title */}
       <div className="mb-6 pt-6">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[13px] text-[#6f6f6f]">
+          <p className="text-[13px] text-[#846848]">
             Show this to your server
           </p>
           <button onClick={() => nav("/scan/results")}>
@@ -141,13 +141,13 @@ export function AllergyCard() {
           </button>
         </div>
         <h1
-          className="text-[24px] text-[#161616] leading-tight"
+          className="text-[24px] text-[#100d09] leading-tight"
           style={{ fontWeight: 600 }}
         >
           <>
             {translations.en.cardTitle}
             {lang !== "en" && (
-              <span className="text-[#8d8d8d] ml-2">
+              <span className="text-[#a4825b] ml-2">
                 {t.cardTitle}
               </span>
             )}
@@ -163,7 +163,7 @@ export function AllergyCard() {
               onClick={() =>
                 setShowLangDropdown(!showLangDropdown)
               }
-              className="flex items-center gap-2 px-4 py-2 bg-[#F4F4F4] rounded-lg text-[15px] text-[#525252]"
+              className="flex items-center gap-2 px-4 py-2 bg-[#fcf5e9] rounded-lg text-[15px] text-[#423424]"
             >
               <span className="text-[20px]">{t.flag}</span>
               <span>{t.label}</span>
@@ -172,13 +172,13 @@ export function AllergyCard() {
 
             <button
               onClick={handleEdit}
-              className="flex items-center gap-1.5 px-3 py-2 text-[#0F62FE] text-[14px] hover:bg-[#F4F4F4] rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-[#525a3f] text-[14px] hover:bg-[#fcf5e9] rounded-lg transition-colors"
             >
               <Edit2 size={14} /> Edit my card
             </button>
 
             {showLangDropdown && (
-              <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-[#e0e0e0] rounded-lg shadow-lg overflow-hidden z-10">
+              <div className="absolute top-full mt-1 left-0 right-0 bg-white border border-[#dbcdbd] rounded-lg shadow-lg overflow-hidden z-10">
                 {Object.entries(translations).map(
                   ([k, v]) => (
                     <button
@@ -187,7 +187,7 @@ export function AllergyCard() {
                         setLang(k);
                         setShowLangDropdown(false);
                       }}
-                      className={`w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-[#F4F4F4] ${k === lang ? "bg-[#E0E0E0]" : ""}`}
+                      className={`w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-[#fcf5e9] ${k === lang ? "bg-[#dbcdbd]" : ""}`}
                     >
                       <span className="text-[20px]">
                         {v.flag}
@@ -205,8 +205,8 @@ export function AllergyCard() {
           {/* Languages I speak */}
           {profile.spokenLanguages && (
             <div className="space-y-2">
-              <div className="bg-[#F4F4F4] rounded-lg p-4">
-                <p className="text-[16px] text-[#161616] leading-relaxed">
+              <div className="bg-[#fcf5e9] rounded-lg p-4">
+                <p className="text-[16px] text-[#100d09] leading-relaxed">
                   <span style={{ fontWeight: 600 }}>Languages I speak:</span> {profile.spokenLanguages}
                 </p>
               </div>
@@ -215,13 +215,13 @@ export function AllergyCard() {
 
           {/* Title + Can't eat combined */}
           <div className="space-y-2">
-            <div className="bg-[#F4F4F4] rounded-lg p-4">
-              <p className="text-[20px] text-[#161616] leading-relaxed">
+            <div className="bg-[#fcf5e9] rounded-lg p-4">
+              <p className="text-[20px] text-[#100d09] leading-relaxed">
                 🔴 {t.content.title} {t.content.cant}
               </p>
             </div>
             {lang !== "en" && (
-              <p className="text-[14px] text-[#8d8d8d]">
+              <p className="text-[14px] text-[#a4825b]">
                 {englishContent.title} {englishContent.cant}
               </p>
             )}
@@ -229,9 +229,9 @@ export function AllergyCard() {
 
           {/* Cross-contamination warning - now using profile-specific text */}
           <div className="space-y-2">
-            <div className="bg-[#F4F4F4] rounded-lg p-4">
+            <div className="bg-[#fcf5e9] rounded-lg p-4">
               <p
-                className="text-[18px] text-[#161616] leading-relaxed"
+                className="text-[18px] text-[#100d09] leading-relaxed"
                 style={{ fontWeight: 600 }}
               >
                 🔴 {crossContaminationText}
@@ -239,7 +239,7 @@ export function AllergyCard() {
             </div>
             {lang !== "en" && (
               <p
-                className="text-[14px] text-[#8d8d8d]"
+                className="text-[14px] text-[#a4825b]"
                 style={{ fontWeight: 600 }}
               >
                 {crossContaminationText}
@@ -247,13 +247,13 @@ export function AllergyCard() {
             )}
           </div>
 
-          <hr className="border-[#e0e0e0]" />
+          <hr className="border-[#dbcdbd]" />
 
           {/* Can eat + Can eat list combined */}
           <div className="space-y-2">
-            <div className="bg-[#F4F4F4] rounded-lg p-4">
+            <div className="bg-[#fcf5e9] rounded-lg p-4">
               <p
-                className="text-[20px] text-[#161616] leading-relaxed"
+                className="text-[20px] text-[#100d09] leading-relaxed"
                 style={{ fontWeight: 600 }}
               >
                 🟢 {t.content.can} {t.content.canList}
@@ -261,7 +261,7 @@ export function AllergyCard() {
             </div>
             {lang !== "en" && (
               <p
-                className="text-[14px] text-[#8d8d8d]"
+                className="text-[14px] text-[#a4825b]"
                 style={{ fontWeight: 600 }}
               >
                 {englishContent.can} {englishContent.canList}
@@ -273,16 +273,16 @@ export function AllergyCard() {
 
       <div className="space-y-3 pb-8 pt-4">
         {/* Add to Apple Wallet button */}
-        <button className="w-full flex items-center justify-center gap-2 py-3 bg-[#0F62FE] rounded-lg text-white">
+        <button className="w-full flex items-center justify-center gap-2 py-3 bg-[#525a3f] rounded-lg text-white">
           <Wallet size={18} /> Add to Apple Wallet
         </button>
 
         {/* Share and Copy buttons */}
         <div className="flex gap-3">
-          <button className="flex-1 flex items-center justify-center gap-2 py-3 border border-[#e0e0e0] rounded-lg text-[#161616]">
+          <button className="flex-1 flex items-center justify-center gap-2 py-3 border border-[#dbcdbd] rounded-lg text-[#100d09]">
             <QrCode size={16} /> Share via QR
           </button>
-          <button className="flex-1 flex items-center justify-center gap-2 py-3 border border-[#e0e0e0] rounded-lg text-[#161616]">
+          <button className="flex-1 flex items-center justify-center gap-2 py-3 border border-[#dbcdbd] rounded-lg text-[#100d09]">
             <Copy size={16} /> Copy text
           </button>
         </div>
