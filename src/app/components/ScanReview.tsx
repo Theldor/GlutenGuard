@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { BottomTabs } from "./BottomTabs";
-import menuPhoto from "figma:asset/c9357aea2b88ca7fa509d1ef31ae7ab326906e6f.png";
+import menuPhoto from "@/assets/c9357aea2b88ca7fa509d1ef31ae7ab326906e6f.png";
 
 export function ScanReview() {
   const nav = useNavigate();
