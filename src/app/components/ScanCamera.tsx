@@ -109,12 +109,21 @@ export function ScanCamera() {
   return (
     <div className="flex flex-col h-full bg-black">
       <input
-        ref={fileInputRef}
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handleFiles}
+      />
+      <input
+        ref={galleryRef}
         type="file"
         accept="image/*"
         multiple
         onChange={handleFileSelect}
         className="hidden"
+        onChange={handleFiles}
       />
       <canvas ref={canvasRef} className="hidden" />
 
