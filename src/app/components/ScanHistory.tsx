@@ -13,7 +13,11 @@ function HistoryRow({ entry }: { entry: ScanHistoryEntry }) {
 
   return (
     <button
-      onClick={() => nav("/scan/results", { state: { results: entry.results } })}
+      onClick={() =>
+        nav("/scan/results", {
+          state: { results: entry.results, fromHistory: true },
+        })
+      }
       className="w-full flex items-center gap-3 px-4 py-3.5 bg-white rounded-2xl border border-[#dbcdbd] text-left hover:bg-[#FCF5E8] active:scale-[0.98] transition-all"
     >
       <div className="flex-1 min-w-0">

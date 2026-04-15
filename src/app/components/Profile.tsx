@@ -1,6 +1,6 @@
 import { useApp } from "../store";
 import { BottomTabs } from "./BottomTabs";
-import { CreditCard, Settings, HelpCircle, LogOut, CheckCircle, AlertCircle, AlertTriangle, Edit2, X, Plus, ChevronDown, History } from "lucide-react";
+import { CreditCard, Settings, HelpCircle, LogOut, CheckCircle, AlertCircle, AlertTriangle, Edit2, X, Plus, ChevronDown, History, Menu } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useState, type KeyboardEvent } from "react";
 import { medicalConditions, questions } from "../onboardingData";
@@ -177,13 +177,11 @@ export function Profile() {
               onClick={() => setShowBlockList(!showBlockList)}
               className="w-full flex items-center justify-between px-4 py-4 text-left bg-white hover:bg-[#FCF5E8]"
             >
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col gap-0.5">
-                  <div className="w-3 h-0.5 bg-[#423424]" />
-                  <div className="w-3 h-0.5 bg-[#423424]" />
-                  <div className="w-3 h-0.5 bg-[#423424]" />
-                </div>
-                <span className="text-[#100d09] text-[15px]" style={{ fontWeight: 500 }}>Custom Ingredient Block List</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <Menu size={20} className="text-[#423424] shrink-0" strokeWidth={2} />
+                <span className="text-[#100d09] text-[15px]" style={{ fontWeight: 500 }}>
+                  Custom Ingredient Block List
+                </span>
               </div>
               <ChevronDown 
                 size={20} 
@@ -229,13 +227,12 @@ export function Profile() {
           {/* Scanned History */}
           <button
             onClick={() => nav("/scan/history")}
-            className="w-full flex items-center justify-between px-4 py-4 rounded-2xl border border-[#dbcdbd] text-left bg-white hover:bg-[#FCF5E8]"
+            className="w-full flex items-center px-4 py-4 rounded-2xl border border-[#dbcdbd] text-left bg-white hover:bg-[#FCF5E8]"
           >
-            <div className="flex items-center gap-3">
-              <History size={20} className="text-[#423424]" />
+            <div className="flex items-center gap-3 min-w-0">
+              <History size={20} className="text-[#423424] shrink-0" />
               <span className="text-[#100d09] text-[15px]" style={{ fontWeight: 500 }}>Scanned History</span>
             </div>
-            <ChevronDown size={18} className="text-[#A6A6A6] -rotate-90" />
           </button>
 
           {/* Menu Items */}

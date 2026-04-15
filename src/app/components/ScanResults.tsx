@@ -126,6 +126,8 @@ export function ScanResults() {
   const location = useLocation();
   const { profile, setLastScanResults, addScanHistory } = useApp();
   const results: AnalysisResult = location.state?.results ?? MOCK_RESULTS;
+  const userNote: string = location.state?.note ?? "";
+  const fromHistory = Boolean(location.state?.fromHistory);
 
   const [openSection, setOpenSection] = useState<number>(0);
   const [sortByOriginal, setSortByOriginal] = useState(false);
@@ -138,7 +140,7 @@ export function ScanResults() {
 
   const savedRef = useRef(false);
   useEffect(() => {
-    if (savedRef.current || !location.state?.results) return;
+    if (savedRef.current || !location.state?.results || fromHistory) return;
     savedRef.current = true;
     const avoid = results.caution.filter((i) => i.tag === "High Risk");
     const ask = results.caution.filter((i) => i.tag === "Ask First");
@@ -152,9 +154,13 @@ export function ScanResults() {
       avoidCount: avoid.length,
       results,
     });
-  }, [results, location.state, addScanHistory]);
+  }, [results, location.state, addScanHistory, fromHistory]);
 
   const handleBack = () => {
+    if (fromHistory) {
+      nav("/scan/history");
+      return;
+    }
     setLastScanResults(null);
     nav("/scan");
   };
@@ -245,7 +251,10 @@ export function ScanResults() {
           /* ── Menu Order view ── */
           <div className="border border-[#dbcdbd] rounded-2xl overflow-hidden bg-[#FCFCFC]">
             <div className="space-y-3 px-4 py-3">
-              {results.menuOrder.map((entry, idx) => {
+              {(results.menuOrder && results.menuOrder.length > 0
+                ? results.menuOrder
+                : [...results.safe, ...results.caution].map((i) => ({ type: "item" as const, id: i.id }))
+              ).map((entry, idx) => {
                 if (entry.type === "heading") {
                   return (
                     <p
@@ -323,7 +332,7 @@ export function ScanResults() {
         </button>
       </div>
 
-      {showChat && <AISupportScreen results={results} onClose={() => setShowChat(false)} />}
+      {showChat && <AISupportScreen results={results} userNote={userNote} onClose={() => setShowChat(false)} />}
       {showAllergyCard && (
         <AllergyCardModal onClose={() => setShowAllergyCard(false)} />
       )}
@@ -377,9 +386,11 @@ interface ChatMsg {
 // ─── AI Support overlay ──────────────────────────────────────────────────────
 function AISupportScreen({
   results,
+  userNote,
   onClose,
 }: {
   results: AnalysisResult;
+  userNote: string;
   onClose: () => void;
 }) {
   const { profile } = useApp();
@@ -417,6 +428,7 @@ function AISupportScreen({
       menuSummaryForPrompt(results),
       "",
       "Answer questions about this menu. Be concise (2-4 sentences). If a dish might contain gluten, always err on the side of caution.",
+      ...(userNote ? ["", `The user also noted: "${userNote}"`] : []),
     ].join("\n");
 
     const apiMessages: Array<{ role: string; content: unknown }> = [
@@ -512,12 +524,12 @@ function AISupportScreen({
 
         {/* Dynamic suggestions */}
         {messages.length === 0 && (
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex flex-wrap gap-2 w-full">
             {suggestions.map((s) => (
               <button
                 key={s}
                 onClick={() => sendMessage(s)}
-                className="shrink-0 px-3 py-1.5 bg-[#f3f5f0] text-[#525a3f] rounded-full text-[13px] active:bg-[#e7eae1] transition-colors"
+                className="px-3 py-1.5 bg-[#f3f5f0] text-[#525a3f] rounded-full text-[13px] active:bg-[#e7eae1] transition-colors text-left"
               >
                 {s}
               </button>

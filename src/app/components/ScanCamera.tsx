@@ -174,7 +174,7 @@ export function ScanCamera() {
             <button
               type="button"
               onClick={() => nav(-1)}
-              className="absolute top-2 left-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors top-[max(0.5rem,env(safe-area-inset-top,0px))]"
+              className="absolute left-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center active:bg-white/20 transition-colors top-[max(1rem,env(safe-area-inset-top,0px))]"
             >
               <ArrowLeft size={20} className="text-white" />
             </button>
@@ -200,7 +200,7 @@ export function ScanCamera() {
             <button
               type="button"
               onClick={() => nav(-1)}
-              className="absolute top-2 left-6 w-10 h-10 rounded-full bg-black/30 flex items-center justify-center active:bg-black/50 transition-colors top-[max(0.5rem,env(safe-area-inset-top,0px))]"
+              className="absolute left-6 w-10 h-10 rounded-full bg-black/30 flex items-center justify-center active:bg-black/50 transition-colors top-[max(1rem,env(safe-area-inset-top,0px))]"
             >
               <ArrowLeft size={20} className="text-white" />
             </button>
@@ -208,10 +208,10 @@ export function ScanCamera() {
           </div>
         )}
 
-        <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/90 via-black/70 to-transparent px-6 pb-10 pt-[max(0.5rem,env(safe-area-inset-top,0px))]">
+        <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/90 via-black/70 to-transparent px-6 pb-10 pt-[max(1rem,env(safe-area-inset-top,0px))]">
           <button
             onClick={() => nav(-1)}
-            className="mb-2 top-2 w-10 h-10 rounded-full bg-black/40 flex items-center justify-center active:bg-black/60 transition-colors shrink-0"
+            className="mb-2 w-10 h-10 rounded-full bg-black/40 flex items-center justify-center active:bg-black/60 transition-colors shrink-0"
           >
             <ArrowLeft size={20} className="text-white" />
           </button>

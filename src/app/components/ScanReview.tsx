@@ -40,7 +40,7 @@ export function ScanReview() {
         crossContamination: profile.crossContamination,
         otherDietaryPreferences: profile.otherDietaryPreferences,
       });
-      nav("/scan/results", { state: { results } });
+      nav("/scan/results", { state: { results, note } });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong. Check your API key and try again.";
       setError(msg);
