@@ -107,5 +107,12 @@ Return ONLY valid JSON — no markdown fences, no extra text:
   const data = await response.json();
   const text = data.choices[0].message.content;
   const cleaned = text.replace(/```json|```/g, "").trim();
-  return JSON.parse(cleaned);
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    throw new Error(
+      "No menu detected. Make sure your photo shows a restaurant menu clearly and try again.",
+    );
+  }
 };

@@ -21,7 +21,7 @@ export default function App() {
   return (
     <AppProvider>
       <div
-        className="mx-auto h-screen max-w-[430px] bg-white relative overflow-hidden"
+        className="mx-auto h-svh max-w-[430px] bg-white relative overflow-hidden"
         style={{ fontFamily: "'Geist', sans-serif" }}
       >
         <AutoRedirect />
