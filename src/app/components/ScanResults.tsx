@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { ArrowLeft, ChevronDown, ChevronUp, Wallet, MessageCircle } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Wallet, MessageCircle, ImagePlus, Loader2, Send } from "lucide-react";
 import { BottomTabs } from "./BottomTabs";
 import { AllergyCard } from "./AllergyCard";
+import { useApp } from "../store";
+import { buildSystemPrompt } from "../utils/profileContext";
 import type { AnalysisResult, AnalyzedMenuItem } from "@/app/lib/analyzeMenu";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -272,7 +274,7 @@ export function ScanResults() {
         </button>
       </div>
 
-      {showChat && <AISupportScreen onClose={() => setShowChat(false)} />}
+      {showChat && <AISupportScreen results={results} onClose={() => setShowChat(false)} />}
       {showAllergyCard && (
         <AllergyCardModal onClose={() => setShowAllergyCard(false)} />
       )}
@@ -282,10 +284,164 @@ export function ScanResults() {
   );
 }
 
-// ─── AI Support overlay ───────────────────────────────────────────────────────
-function AISupportScreen({ onClose }: { onClose: () => void }) {
+// ─── Build menu summary for the system prompt ────────────────────────────────
+function menuSummaryForPrompt(r: AnalysisResult): string {
+  const lines = [`Restaurant: ${r.restaurant} (${r.cuisine})`];
+  if (r.safe.length)
+    lines.push(`Safe items: ${r.safe.map((i) => i.name).join(", ")}`);
+  const ask = r.caution.filter((i) => i.tag === "Ask First");
+  if (ask.length)
+    lines.push(`Ask-first items: ${ask.map((i) => `${i.name} — ${i.ask}`).join("; ")}`);
+  const avoid = r.caution.filter((i) => i.tag === "High Risk");
+  if (avoid.length)
+    lines.push(`Avoid items: ${avoid.map((i) => `${i.name} — ${i.ask}`).join("; ")}`);
+  return lines.join("\n");
+}
+
+function generateSuggestions(r: AnalysisResult): string[] {
+  const suggestions: string[] = [];
+  const askItems = r.caution.filter((i) => i.tag === "Ask First");
+  const avoidItems = r.caution.filter((i) => i.tag === "High Risk");
+
+  if (askItems.length > 0)
+    suggestions.push(`Is the ${askItems[0].name} safe for me?`);
+  if (r.safe.length > 1)
+    suggestions.push(`Which safe dish do you recommend?`);
+  if (askItems.length > 0)
+    suggestions.push(`What should I ask the server about ${askItems[Math.min(1, askItems.length - 1)].name}?`);
+  if (avoidItems.length > 0)
+    suggestions.push(`Any substitute for ${avoidItems[0].name}?`);
+  if (suggestions.length < 3)
+    suggestions.push("What should I tell the server about my needs?");
+
+  return suggestions.slice(0, 3);
+}
+
+// ─── Chat message types ──────────────────────────────────────────────────────
+type ChatRole = "user" | "assistant";
+interface ChatMsg {
+  role: ChatRole;
+  content: string;
+  image?: string;
+}
+
+// ─── AI Support overlay ──────────────────────────────────────────────────────
+function AISupportScreen({
+  results,
+  onClose,
+}: {
+  results: AnalysisResult;
+  onClose: () => void;
+}) {
+  const { profile } = useApp();
+  const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [input, setInput] = useState("");
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const suggestions = generateSuggestions(results);
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    }, 50);
+  };
+
+  const sendMessage = async (text: string) => {
+    if ((!text.trim() && !pendingImage) || loading) return;
+
+    const userMsg: ChatMsg = { role: "user", content: text.trim(), image: pendingImage ?? undefined };
+    const next = [...messages, userMsg];
+    setMessages(next);
+    setInput("");
+    setPendingImage(null);
+    setLoading(true);
+    scrollToBottom();
+
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    const systemPrompt = [
+      buildSystemPrompt(profile),
+      "",
+      "Here is the scanned menu the user is currently looking at:",
+      menuSummaryForPrompt(results),
+      "",
+      "Answer questions about this menu. Be concise (2-4 sentences). If a dish might contain gluten, always err on the side of caution.",
+    ].join("\n");
+
+    const apiMessages: Array<{ role: string; content: unknown }> = [
+      { role: "system", content: systemPrompt },
+    ];
+
+    for (const m of next) {
+      if (m.role === "user") {
+        if (m.image) {
+          apiMessages.push({
+            role: "user",
+            content: [
+              { type: "text", text: m.content || "What can you tell me about this?" },
+              { type: "image_url", image_url: { url: m.image, detail: "low" } },
+            ],
+          });
+        } else {
+          apiMessages.push({ role: "user", content: m.content });
+        }
+      } else {
+        apiMessages.push({ role: "assistant", content: m.content });
+      }
+    }
+
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: apiMessages,
+          max_tokens: 512,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || "API error");
+      }
+
+      const data = await res.json();
+      const reply = data.choices[0].message.content;
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Something went wrong.";
+      setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${msg}` }]);
+    } finally {
+      setLoading(false);
+      scrollToBottom();
+    }
+  };
+
+  const handleImagePick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPendingImage(reader.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(input);
+    }
+  };
+
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-white">
+      {/* Header */}
       <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd]">
         <div className="mb-3">
           <button
@@ -297,32 +453,111 @@ function AISupportScreen({ onClose }: { onClose: () => void }) {
         </div>
         <h1 className="text-[20px] font-semibold text-[#100d09]">AI Support</h1>
       </div>
-      <div className="flex-1 overflow-auto px-4 py-4">
-        <p className="text-[#423424] text-[14px] mb-4">
-          I see you're looking at this menu. What would you like to know?
+
+      {/* Messages */}
+      <div ref={scrollRef} className="flex-1 overflow-auto px-4 py-4 space-y-3">
+        {/* Intro */}
+        <p className="text-[#423424] text-[14px]">
+          I see you're looking at {results.restaurant}'s menu. What would you like to know?
         </p>
-        <div className="flex gap-2 overflow-x-auto mb-4 pb-1">
-          {[
-            "Is the pasta safe?",
-            "What should I ask the server?",
-            "Translate my allergy card",
-          ].map((c) => (
-            <span
-              key={c}
-              className="shrink-0 px-3 py-1.5 bg-[#f3f5f0] text-[#525a3f] rounded-full text-[13px]"
+
+        {/* Dynamic suggestions */}
+        {messages.length === 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {suggestions.map((s) => (
+              <button
+                key={s}
+                onClick={() => sendMessage(s)}
+                className="shrink-0 px-3 py-1.5 bg-[#f3f5f0] text-[#525a3f] rounded-full text-[13px] active:bg-[#e7eae1] transition-colors"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Chat bubbles */}
+        {messages.map((m, i) => (
+          <div
+            key={i}
+            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[14px] leading-relaxed ${
+                m.role === "user"
+                  ? "bg-[#525a3f] text-white rounded-br-md"
+                  : "bg-[#f3f5f0] text-[#100d09] rounded-bl-md"
+              }`}
             >
-              {c}
-            </span>
-          ))}
-        </div>
+              {m.image && (
+                <img
+                  src={m.image}
+                  alt="Uploaded"
+                  className="w-full max-w-[200px] rounded-lg mb-2"
+                />
+              )}
+              <p className="whitespace-pre-wrap">{m.content}</p>
+            </div>
+          </div>
+        ))}
+
+        {/* Typing indicator */}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="bg-[#f3f5f0] rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-2">
+              <Loader2 size={14} className="animate-spin text-[#525a3f]" />
+              <span className="text-[13px] text-[#846848]">Thinking…</span>
+            </div>
+          </div>
+        )}
       </div>
-      <div className="border-t border-[#dbcdbd] px-4 py-3 pb-10 flex gap-2">
+
+      {/* Pending image preview */}
+      {pendingImage && (
+        <div className="px-4 pb-2 flex items-center gap-2">
+          <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-[#dbcdbd]">
+            <img src={pendingImage} alt="Pending" className="w-full h-full object-cover" />
+            <button
+              onClick={() => setPendingImage(null)}
+              className="absolute -top-1 -right-1 w-5 h-5 bg-[#d4183d] rounded-full flex items-center justify-center"
+            >
+              <span className="text-white text-[10px] leading-none font-bold">✕</span>
+            </button>
+          </div>
+          <span className="text-[12px] text-[#846848]">Image attached</span>
+        </div>
+      )}
+
+      {/* Input bar */}
+      <div className="border-t border-[#dbcdbd] px-4 py-3 pb-6 flex items-center gap-2">
         <input
-          className="flex-1 bg-[#fcf5e9] rounded-full px-4 py-2.5 text-[14px] outline-none"
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImagePick}
+          className="hidden"
+        />
+        <button
+          onClick={() => fileRef.current?.click()}
+          disabled={loading}
+          className="w-10 h-10 shrink-0 rounded-full bg-[#fcf5e9] flex items-center justify-center active:bg-[#f3f5f0] transition-colors disabled:opacity-40"
+        >
+          <ImagePlus size={18} className="text-[#525a3f]" />
+        </button>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={loading}
+          className="flex-1 bg-[#fcf5e9] rounded-full px-4 py-2.5 text-[14px] outline-none disabled:opacity-60"
           placeholder="Ask about this menu…"
         />
-        <button className="w-10 h-10 rounded-full bg-[#525a3f] flex items-center justify-center text-white">
-          ↑
+        <button
+          onClick={() => sendMessage(input)}
+          disabled={loading || (!input.trim() && !pendingImage)}
+          className="w-10 h-10 shrink-0 rounded-full bg-[#525a3f] flex items-center justify-center text-white disabled:opacity-40 active:scale-95 transition-transform"
+        >
+          <Send size={16} />
         </button>
       </div>
     </div>
