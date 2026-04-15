@@ -85,10 +85,17 @@ export function ScanReview() {
             </p>
             <button
               onClick={() => nav("/scan")}
-              className="px-6 py-3 rounded-lg bg-[#525a3f] text-white text-[15px] active:scale-95 transition-transform"
+              className="px-6 py-3 rounded-lg bg-[#525a3f] text-white text-[15px] active:scale-95 transition-transform w-full max-w-[260px]"
               style={{ fontWeight: 500 }}
             >
               Back to Camera
+            </button>
+            <button
+              onClick={() => addRef.current?.click()}
+              className="px-6 py-3 rounded-lg border border-[#dbcdbd] text-[#100d09] text-[15px] active:scale-95 transition-transform w-full max-w-[260px]"
+              style={{ fontWeight: 500 }}
+            >
+              Upload Photo
             </button>
           </div>
         ) : (

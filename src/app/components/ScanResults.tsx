@@ -124,7 +124,7 @@ function AccordionSection({
 export function ScanResults() {
   const nav = useNavigate();
   const location = useLocation();
-  const { profile, setLastScanResults } = useApp();
+  const { profile, setLastScanResults, addScanHistory } = useApp();
   const results: AnalysisResult = location.state?.results ?? MOCK_RESULTS;
 
   const [openSection, setOpenSection] = useState<number>(0);
@@ -135,6 +135,24 @@ export function ScanResults() {
   useEffect(() => {
     setLastScanResults(results);
   }, [results, setLastScanResults]);
+
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (savedRef.current || !location.state?.results) return;
+    savedRef.current = true;
+    const avoid = results.caution.filter((i) => i.tag === "High Risk");
+    const ask = results.caution.filter((i) => i.tag === "Ask First");
+    addScanHistory({
+      id: `scan-${Date.now()}`,
+      scannedAt: new Date().toISOString(),
+      restaurant: results.restaurant,
+      cuisine: results.cuisine,
+      safeCount: results.safe.length,
+      cautionCount: ask.length,
+      avoidCount: avoid.length,
+      results,
+    });
+  }, [results, location.state, addScanHistory]);
 
   const handleBack = () => {
     setLastScanResults(null);
@@ -597,23 +615,31 @@ function AISupportScreen({
 
 // ─── Allergy card modal ───────────────────────────────────────────────────────
 function AllergyCardModal({ onClose }: { onClose: () => void }) {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [phase, setPhase] = useState<"entering" | "open" | "closing">("entering");
+
   useEffect(() => {
-    setIsAnimating(true);
+    requestAnimationFrame(() => setPhase("open"));
   }, []);
+
+  const handleClose = () => {
+    setPhase("closing");
+    setTimeout(onClose, 500);
+  };
+
+  const isVisible = phase === "open";
 
   return (
     <>
       <div
-        className="absolute inset-0 z-50 bg-black transition-opacity duration-[800ms]"
-        style={{ opacity: isAnimating ? 0.5 : 0 }}
-        onClick={onClose}
+        className="absolute inset-0 z-50 bg-black transition-opacity duration-500"
+        style={{ opacity: isVisible ? 0.5 : 0 }}
+        onClick={handleClose}
       />
       <div
-        className="absolute inset-0 z-50 flex flex-col bg-white rounded-t-3xl transition-transform duration-[800ms] ease-out"
-        style={{ transform: isAnimating ? "translateY(0)" : "translateY(100%)" }}
+        className="absolute inset-0 z-50 flex flex-col bg-white rounded-t-3xl transition-transform duration-500 ease-out"
+        style={{ transform: isVisible ? "translateY(0)" : "translateY(100%)" }}
       >
-        <AllergyCard onClose={onClose} />
+        <AllergyCard onClose={handleClose} />
       </div>
     </>
   );

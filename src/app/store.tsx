@@ -46,8 +46,20 @@ export interface Trip {
   restaurants: Restaurant[];
 }
 
+export interface ScanHistoryEntry {
+  id: string;
+  scannedAt: string;
+  restaurant: string;
+  cuisine: string;
+  safeCount: number;
+  cautionCount: number;
+  avoidCount: number;
+  results: unknown;
+}
+
 const STORAGE_KEY = "glutenguard_state";
 const ACCOUNT_SNAPSHOT_KEY = "glutenguard_account_snapshot";
+const SCAN_HISTORY_KEY = "glutenguard_scan_history";
 
 const DEFAULT_PROFILE: UserProfile = {
   name: "Your Name",
@@ -133,6 +145,8 @@ interface AppState {
   restoreAccount: () => boolean;
   lastScanResults: unknown | null;
   setLastScanResults: (r: unknown | null) => void;
+  scanHistory: ScanHistoryEntry[];
+  addScanHistory: (entry: ScanHistoryEntry) => void;
 }
 
 const Ctx = createContext<AppState>({} as AppState);
@@ -146,6 +160,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [cardLanguage, _setCardLanguage] = useState(initial.cardLanguage);
   const [trips, _setTrips] = useState<Trip[]>(initial.trips);
   const [lastScanResults, setLastScanResults] = useState<unknown | null>(null);
+
+  const [scanHistory, _setScanHistory] = useState<ScanHistoryEntry[]>(() => {
+    try {
+      const raw = localStorage.getItem(SCAN_HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
+
+  const addScanHistory = (entry: ScanHistoryEntry) => {
+    _setScanHistory((prev) => {
+      const next = [entry, ...prev].slice(0, 50);
+      try { localStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
 
   // Persist every change to localStorage
   useEffect(() => {
@@ -208,6 +237,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         restoreAccount,
         lastScanResults,
         setLastScanResults,
+        scanHistory,
+        addScanHistory,
       }}
     >
       {children}

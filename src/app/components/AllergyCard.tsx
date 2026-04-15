@@ -221,7 +221,7 @@ export function AllergyCard({ onClose }: { onClose?: () => void } = {}) {
               </p>
             </div>
             {lang !== "en" && (
-              <p className="text-[14px] text-[#A6A6A6]">
+              <p className="text-[14px] text-[#A6A6A6] border-b border-[#dbcdbd] pb-3 mb-1">
                 {englishContent.title} {englishContent.cant}
               </p>
             )}
@@ -239,15 +239,13 @@ export function AllergyCard({ onClose }: { onClose?: () => void } = {}) {
             </div>
             {lang !== "en" && (
               <p
-                className="text-[14px] text-[#A6A6A6]"
+                className="text-[14px] text-[#A6A6A6] border-b border-[#dbcdbd] pb-3 mb-1"
                 style={{ fontWeight: 600 }}
               >
                 {crossContaminationText}
               </p>
             )}
           </div>
-
-          <hr className="border-[#dbcdbd]" />
 
           {/* Can eat + Can eat list combined */}
           <div className="space-y-2">
