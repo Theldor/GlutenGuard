@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { ArrowLeft, ChevronDown, ChevronUp, Wallet, MessageCircle, ImagePlus, Loader2, Send } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Wallet, MessageCircle, ImagePlus, Loader2, Send, X } from "lucide-react";
 import { BottomTabs } from "./BottomTabs";
 import { AllergyCard } from "./AllergyCard";
 import { useApp } from "../store";
@@ -183,28 +183,29 @@ export function ScanResults() {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Header */}
-      <div className="px-4 pt-4 pb-3">
-        <div className="mb-3">
-          <button
-            onClick={handleBack}
-            className="flex items-center justify-center w-8 h-8"
-          >
-            <ArrowLeft size={20} />
-          </button>
-        </div>
+      {/* Fixed header — back + restaurant name only */}
+      <div className="px-4 pt-4 pb-2 shrink-0">
+        <button
+          onClick={handleBack}
+          className="flex items-center justify-center w-8 h-8 mb-2"
+        >
+          <ArrowLeft size={20} />
+        </button>
 
-        <h1 className="text-[20px] font-semibold text-[#100d09] mb-0">
+        <p className="text-[13px] font-semibold text-[#846848] uppercase tracking-wide mb-0.5">
           Scanned Results
-        </h1>
-
-        <div className="mb-2 flex items-center gap-2 flex-wrap">
-          <h2 className="text-[#100d09]">{results.restaurant}</h2>
+        </p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h2 className="text-[#100d09] text-[22px]" style={{ fontWeight: 700 }}>{results.restaurant}</h2>
           <span className="px-2 py-0.5 rounded text-[13px] bg-[#f3f5f0] text-[#525a3f]">
             {results.cuisine}
           </span>
         </div>
+      </div>
 
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-auto px-4 pb-3">
+        {/* Profile banner */}
         {!hasProfile && (
           <div className="bg-[#FFF8ED] border border-[#E8D5B0] rounded-lg p-3 mb-2">
             <p className="text-[13px] text-[#6b5530] leading-snug">
@@ -220,12 +221,12 @@ export function ScanResults() {
           </div>
         )}
 
-        <div className="bg-[#f3f5f0] border border-[#b8c0a5] rounded-lg p-3 mt-2">
+        <div className="bg-[#f3f5f0] border border-[#b8c0a5] rounded-lg p-3 mb-3">
           <p className="text-[13px] text-[#373c2a]">{results.banner}</p>
         </div>
 
         {/* Sort toggle */}
-        <div className="mt-3 flex items-center justify-between">
+        <div className="flex items-center justify-between mb-3">
           <span className="text-[13px] text-[#423424]">Display order:</span>
           <div className="flex gap-1 bg-white rounded-md p-0.5">
             {(["By Safety", "Menu Order"] as const).map((label, i) => (
@@ -243,10 +244,6 @@ export function ScanResults() {
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-auto px-4 pb-3">
         {sortByOriginal ? (
           /* ── Menu Order view ── */
           <div className="border border-[#dbcdbd] rounded-2xl overflow-hidden bg-[#FCFCFC]">
@@ -315,24 +312,24 @@ export function ScanResults() {
       </div>
 
       {/* Bottom actions */}
-      <div className="border-t border-[#dbcdbd] px-4 py-3 space-y-3 bg-white">
+      <div className="border-t border-[#dbcdbd] px-4 py-3 bg-white shrink-0 flex gap-2">
         <button
           onClick={() => setShowAllergyCard(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 bg-[#525a3f] rounded-lg text-white text-[15px]"
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 bg-[#525a3f] rounded-lg text-white text-[14px]"
           style={{ fontWeight: 500 }}
         >
-          <Wallet size={18} /> Show My Allergy Card
+          <Wallet size={16} /> Allergy Card
         </button>
         <button
           onClick={() => setShowChat(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 border border-[#dbcdbd] rounded-lg text-[#100d09] text-[15px]"
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 border border-[#dbcdbd] rounded-lg text-[#100d09] text-[14px]"
           style={{ fontWeight: 500 }}
         >
           <MessageCircle size={16} /> AI Support
         </button>
       </div>
 
-      {showChat && <AISupportScreen results={results} userNote={userNote} onClose={() => setShowChat(false)} />}
+      {showChat && <AISupportScreenModal results={results} userNote={userNote} onClose={() => setShowChat(false)} />}
       {showAllergyCard && (
         <AllergyCardModal onClose={() => setShowAllergyCard(false)} />
       )}
@@ -383,7 +380,47 @@ interface ChatMsg {
   image?: string;
 }
 
-// ─── AI Support overlay ──────────────────────────────────────────────────────
+// ─── AI Support slide-up modal ────────────────────────────────────────────────
+function AISupportScreenModal({
+  results,
+  userNote,
+  onClose,
+}: {
+  results: AnalysisResult;
+  userNote: string;
+  onClose: () => void;
+}) {
+  const [phase, setPhase] = useState<"entering" | "open" | "closing">("entering");
+
+  useEffect(() => {
+    requestAnimationFrame(() => setPhase("open"));
+  }, []);
+
+  const handleClose = () => {
+    setPhase("closing");
+    setTimeout(onClose, 500);
+  };
+
+  const isVisible = phase === "open";
+
+  return (
+    <>
+      <div
+        className="absolute inset-0 z-50 bg-black transition-opacity duration-500"
+        style={{ opacity: isVisible ? 0.5 : 0 }}
+        onClick={handleClose}
+      />
+      <div
+        className="absolute inset-0 z-50 flex flex-col bg-white rounded-t-3xl transition-transform duration-500 ease-out overflow-hidden"
+        style={{ transform: isVisible ? "translateY(0)" : "translateY(100%)" }}
+      >
+        <AISupportScreen results={results} userNote={userNote} onClose={handleClose} />
+      </div>
+    </>
+  );
+}
+
+// ─── AI Support inner content ─────────────────────────────────────────────────
 function AISupportScreen({
   results,
   userNote,
@@ -501,18 +538,16 @@ function AISupportScreen({
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col bg-white">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd]">
-        <div className="mb-3">
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center w-8 h-8"
-          >
-            <ArrowLeft size={20} />
-          </button>
-        </div>
-        <h1 className="text-[20px] font-semibold text-[#100d09]">AI Support</h1>
+      <div className="flex items-center justify-between px-4 pt-5 pb-3 border-b border-[#dbcdbd]">
+        <h1 className="text-[28px] text-[#100d09]" style={{ fontWeight: 700 }}>AI Support</h1>
+        <button
+          onClick={onClose}
+          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#FCF5E8] transition-colors"
+        >
+          <X size={20} className="text-[#423424]" />
+        </button>
       </div>
 
       {/* Messages */}
@@ -590,7 +625,7 @@ function AISupportScreen({
       )}
 
       {/* Input bar */}
-      <div className="border-t border-[#dbcdbd] px-4 py-3 pb-6 flex items-center gap-2">
+      <div className="border-t border-[#dbcdbd] px-4 py-3 pb-6 flex items-center gap-2 shrink-0">
         <input
           ref={fileRef}
           type="file"
@@ -601,7 +636,7 @@ function AISupportScreen({
         <button
           onClick={() => fileRef.current?.click()}
           disabled={loading}
-          className="w-10 h-10 shrink-0 rounded-full bg-[#fcf5e9] flex items-center justify-center active:bg-[#f3f5f0] transition-colors disabled:opacity-40"
+          className="w-10 h-10 shrink-0 rounded-full bg-[#F2F2F2] flex items-center justify-center active:bg-[#e8e8e8] transition-colors disabled:opacity-40"
         >
           <ImagePlus size={18} className="text-[#525a3f]" />
         </button>
@@ -610,7 +645,7 @@ function AISupportScreen({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={loading}
-          className="flex-1 bg-[#fcf5e9] rounded-full px-4 py-2.5 text-[14px] outline-none disabled:opacity-60"
+          className="flex-1 bg-[#F2F2F2] rounded-full px-4 py-2.5 text-[14px] outline-none disabled:opacity-60"
           placeholder="Ask about this menu…"
         />
         <button
