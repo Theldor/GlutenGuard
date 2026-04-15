@@ -124,12 +124,28 @@ function AccordionSection({
 export function ScanResults() {
   const nav = useNavigate();
   const location = useLocation();
+  const { profile, setLastScanResults } = useApp();
   const results: AnalysisResult = location.state?.results ?? MOCK_RESULTS;
 
   const [openSection, setOpenSection] = useState<number>(0);
   const [sortByOriginal, setSortByOriginal] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showAllergyCard, setShowAllergyCard] = useState(false);
+
+  useEffect(() => {
+    setLastScanResults(results);
+  }, [results, setLastScanResults]);
+
+  const handleBack = () => {
+    setLastScanResults(null);
+    nav("/scan");
+  };
+
+  const hasProfile =
+    !!profile.condition ||
+    profile.customBlockedIngredients.length > 0 ||
+    profile.additionalRestrictions.length > 0 ||
+    !!profile.otherDietaryPreferences;
 
   const askFirst = results.caution.filter((i) => i.tag === "Ask First");
   const avoid    = results.caution.filter((i) => i.tag === "High Risk");
@@ -147,7 +163,7 @@ export function ScanResults() {
       <div className="px-4 pt-4 pb-3">
         <div className="mb-3">
           <button
-            onClick={() => nav("/scan/review")}
+            onClick={handleBack}
             className="flex items-center justify-center w-8 h-8"
           >
             <ArrowLeft size={20} />
@@ -158,12 +174,27 @@ export function ScanResults() {
           Scanned Results
         </h1>
 
-        <div className="mb-4 flex items-center gap-2 flex-wrap">
+        <div className="mb-2 flex items-center gap-2 flex-wrap">
           <h2 className="text-[#100d09]">{results.restaurant}</h2>
           <span className="px-2 py-0.5 rounded text-[13px] bg-[#f3f5f0] text-[#525a3f]">
             {results.cuisine}
           </span>
         </div>
+
+        {!hasProfile && (
+          <div className="bg-[#FFF8ED] border border-[#E8D5B0] rounded-lg p-3 mb-2">
+            <p className="text-[13px] text-[#6b5530] leading-snug">
+              Results are generic because you haven't set up your dietary profile yet.{" "}
+              <button
+                onClick={() => nav("/profile")}
+                className="underline font-medium text-[#525a3f]"
+              >
+                Set up my profile
+              </button>{" "}
+              for personalized safety ratings.
+            </p>
+          </div>
+        )}
 
         <div className="bg-[#f3f5f0] border border-[#b8c0a5] rounded-lg p-3 mt-2">
           <p className="text-[13px] text-[#373c2a]">{results.banner}</p>

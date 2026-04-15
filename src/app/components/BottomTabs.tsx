@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router";
 import { Camera, Map, Plane, User } from "lucide-react";
+import { useApp } from "../store";
 
 const tabs = [
   { path: "/scan", label: "Scan", icon: Camera },
@@ -11,6 +12,15 @@ const tabs = [
 export function BottomTabs() {
   const nav = useNavigate();
   const loc = useLocation();
+  const { lastScanResults } = useApp();
+
+  const handleTab = (path: string) => {
+    if (path === "/scan" && lastScanResults) {
+      nav("/scan/results", { state: { results: lastScanResults } });
+    } else {
+      nav(path);
+    }
+  };
 
   return (
     <div className="flex items-center justify-around border-t border-[#dbcdbd] bg-white py-2 shrink-0">
@@ -19,7 +29,7 @@ export function BottomTabs() {
         return (
           <button
             key={t.path}
-            onClick={() => nav(t.path)}
+            onClick={() => handleTab(t.path)}
             className={`flex flex-col items-center gap-0.5 px-4 py-1 ${active ? "text-[#525a3f]" : "text-[#846848]"}`}
           >
             <t.icon size={22} />

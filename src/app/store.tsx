@@ -131,6 +131,8 @@ interface AppState {
   deleteTrip: (id: string) => void;
   signOut: () => void;
   restoreAccount: () => boolean;
+  lastScanResults: unknown | null;
+  setLastScanResults: (r: unknown | null) => void;
 }
 
 const Ctx = createContext<AppState>({} as AppState);
@@ -143,6 +145,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [onboardingComplete, _setOnboardingComplete] = useState(initial.onboardingComplete);
   const [cardLanguage, _setCardLanguage] = useState(initial.cardLanguage);
   const [trips, _setTrips] = useState<Trip[]>(initial.trips);
+  const [lastScanResults, setLastScanResults] = useState<unknown | null>(null);
 
   // Persist every change to localStorage
   useEffect(() => {
@@ -203,6 +206,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         deleteTrip,
         signOut,
         restoreAccount,
+        lastScanResults,
+        setLastScanResults,
       }}
     >
       {children}

@@ -1,22 +1,48 @@
 import { useNavigate } from "react-router";
-import { Image, X, Camera, FlipHorizontal } from "lucide-react";
-import { BottomTabs } from "./BottomTabs";
+import { Image, X, Camera, ArrowLeft } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 
 type PermState = "idle" | "requesting" | "granted" | "denied";
+
+/** Crop region of the video that matches CSS object-cover in a CW×CH box. */
+function objectCoverCrop(
+  videoW: number,
+  videoH: number,
+  boxW: number,
+  boxH: number,
+) {
+  const scale = Math.max(boxW / videoW, boxH / videoH);
+  const sw = boxW / scale;
+  const sh = boxH / scale;
+  const sx = (videoW - sw) / 2;
+  const sy = (videoH - sh) / 2;
+  return { sx, sy, sw, sh };
+}
 
 export function ScanCamera() {
   const nav = useNavigate();
   const [photos, setPhotos] = useState<string[]>([]);
   const [perm, setPerm] = useState<PermState>("idle");
-  const [facing, setFacing] = useState<"environment" | "user">("environment");
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [, setViewportSize] = useState({ w: 0, h: 0 });
 
-  const startCamera = useCallback(async (facingMode: "environment" | "user") => {
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const sync = () =>
+      setViewportSize({ w: el.clientWidth, h: el.clientHeight });
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const startCamera = useCallback(async () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
@@ -24,7 +50,7 @@ export function ScanCamera() {
     setPerm("requesting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode },
+        video: { facingMode: "environment" },
         audio: false,
       });
       streamRef.current = stream;
@@ -38,25 +64,37 @@ export function ScanCamera() {
   }, []);
 
   useEffect(() => {
-    startCamera(facing);
+    startCamera();
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
     };
-  }, [startCamera, facing]);
-
-  const flipCamera = () =>
-    setFacing((f) => (f === "environment" ? "user" : "environment"));
+  }, [startCamera]);
 
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas || perm !== "granted") return;
+    const viewport = viewportRef.current;
+    if (!video || !canvas || !viewport || perm !== "granted") return;
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (vw === 0 || vh === 0) return;
+
+    const cw = viewport.clientWidth;
+    const ch = viewport.clientHeight;
+    if (cw === 0 || ch === 0) return;
+
+    const { sx, sy, sw, sh } = objectCoverCrop(vw, vh, cw, ch);
+
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const outW = Math.round(cw * dpr);
+    const outH = Math.round(ch * dpr);
+
+    canvas.width = outW;
+    canvas.height = outH;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, outW, outH);
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
     setPhotos((prev) => [...prev, dataUrl]);
@@ -72,7 +110,6 @@ export function ScanCamera() {
 
   const saveToAlbum = async (blob: Blob, filename: string) => {
     const file = new File([blob], filename, { type: "image/jpeg" });
-    // Web Share API — saves to camera roll on iOS / Android
     if (
       typeof navigator.canShare === "function" &&
       navigator.canShare({ files: [file] })
@@ -84,7 +121,6 @@ export function ScanCamera() {
         // User dismissed share sheet — photo is still captured in-app
       }
     }
-    // Desktop fallback: trigger a download
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = filename;
@@ -124,8 +160,14 @@ export function ScanCamera() {
       />
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="flex-1 relative overflow-hidden">
-        {/* Live camera stream */}
+      <div ref={viewportRef} className="flex-1 relative overflow-hidden">
+        {/* Back button */}
+        <button
+          onClick={() => nav(-1)}
+          className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-black/40 flex items-center justify-center active:bg-black/60 transition-colors"
+        >
+          <ArrowLeft size={20} className="text-white" />
+        </button>
         <video
           ref={videoRef}
           autoPlay
@@ -134,7 +176,6 @@ export function ScanCamera() {
           className="absolute inset-0 w-full h-full object-cover"
         />
 
-        {/* Permission denied overlay */}
         {perm === "denied" && (
           <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center px-8 text-center z-20">
             <Camera size={48} className="text-white/50 mb-4" />
@@ -146,7 +187,7 @@ export function ScanCamera() {
               again.
             </p>
             <button
-              onClick={() => startCamera(facing)}
+              onClick={() => startCamera()}
               className="px-6 py-3 rounded-full bg-[#525a3f] text-white text-[15px] font-medium active:scale-95 transition-transform"
             >
               Try again
@@ -154,14 +195,12 @@ export function ScanCamera() {
           </div>
         )}
 
-        {/* Requesting overlay */}
         {perm === "requesting" && (
           <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-20">
             <p className="text-white/80 text-[15px]">Requesting camera…</p>
           </div>
         )}
 
-        {/* Header overlay */}
         <div className="absolute top-0 left-0 right-0 pt-8 px-6 z-10 bg-gradient-to-b from-black/90 via-black/70 to-transparent pb-12">
           <h1 className="text-white text-[28px] font-semibold mb-3">
             Scan your menu
@@ -172,7 +211,6 @@ export function ScanCamera() {
           </p>
         </div>
 
-        {/* Viewfinder brackets */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
           <div className="w-[280px] h-[280px] relative">
             <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-white/60 rounded-tl-lg" />
@@ -182,7 +220,6 @@ export function ScanCamera() {
           </div>
         </div>
 
-        {/* Captured photo thumbnails */}
         {photos.length > 0 && (
           <div className="absolute bottom-32 left-6 flex gap-2 z-10">
             {photos.map((photo, i) => (
@@ -205,10 +242,8 @@ export function ScanCamera() {
           </div>
         )}
 
-        {/* Bottom controls */}
         <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 to-transparent pt-16 pb-6 px-6 z-10">
           <div className="relative flex items-center justify-center">
-            {/* Gallery / upload button */}
             <button
               onClick={() => fileInputRef.current?.click()}
               className="absolute left-0 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center active:bg-white/30 transition-colors"
@@ -216,22 +251,12 @@ export function ScanCamera() {
               <Image size={20} className="text-white" />
             </button>
 
-            {/* Shutter button */}
             <button
               onClick={capturePhoto}
               disabled={perm !== "granted"}
               className="w-16 h-16 rounded-full bg-white border-4 border-[#525a3f] active:scale-95 transition-transform disabled:opacity-40"
             />
 
-            {/* Flip camera (right of shutter) */}
-            <button
-              onClick={flipCamera}
-              className="absolute right-20 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center active:bg-white/30 transition-colors"
-            >
-              <FlipHorizontal size={18} className="text-white" />
-            </button>
-
-            {/* Next → review step */}
             {photos.length > 0 && (
               <button
                 onClick={() =>
@@ -245,8 +270,6 @@ export function ScanCamera() {
           </div>
         </div>
       </div>
-
-      <BottomTabs />
     </div>
   );
 }
