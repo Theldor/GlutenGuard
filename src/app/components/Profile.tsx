@@ -36,6 +36,8 @@ export function Profile() {
   const [showBlockList, setShowBlockList] = useState(false);
   const [editStep, setEditStep] = useState<number | null>(null);
   const [showBlockListModal, setShowBlockListModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [draftName, setDraftName] = useState(profile.name);
 
   const sympIdx = Math.max(0, profile.symptomatic);
   const badge = riskBadge(profile.symptomatic);
@@ -82,7 +84,7 @@ export function Profile() {
             <span className="text-[#525a3f] text-[15px]" style={{ fontWeight: 600 }}>Allergy Card</span>
           </button>
           <button
-            onClick={() => {}}
+            onClick={() => { setDraftName(profile.name); setShowSettings(true); }}
             className="flex flex-col items-center justify-center gap-2 px-4 py-6 rounded-2xl border-2 border-[#dbcdbd] bg-white text-left hover:bg-[#FCF5E8]"
           >
             <Settings size={24} className="text-[#423424]" />
@@ -267,6 +269,61 @@ export function Profile() {
           }}
           onClose={() => setShowBlockListModal(false)}
         />
+      )}
+
+      {/* Settings modal */}
+      {showSettings && (
+        <div className="absolute inset-0 z-50 flex flex-col bg-white">
+          <div className="flex items-center justify-between px-4 pt-6 pb-4 border-b border-[#dbcdbd]">
+            <h2 className="text-[18px] text-[#100d09]" style={{ fontWeight: 700 }}>Settings</h2>
+            <button
+              onClick={() => setShowSettings(false)}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#FCF5E8]"
+            >
+              <X size={20} className="text-[#423424]" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-auto px-4 py-5 space-y-5">
+            {/* Display name */}
+            <div>
+              <label className="block text-[13px] text-[#846848] mb-1.5" style={{ fontWeight: 600 }}>
+                Display name
+              </label>
+              <input
+                type="text"
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                placeholder="Your name"
+                className="w-full bg-[#F9F9F9] border border-[#dbcdbd] rounded-xl px-4 py-3 text-[15px] text-[#100d09] placeholder:text-[#A6A6A6] outline-none focus:ring-2 focus:ring-[#525a3f] transition-all"
+              />
+              <p className="text-[12px] text-[#A6A6A6] mt-1.5">
+                Used in your profile header and allergy card.
+              </p>
+            </div>
+          </div>
+
+          <div className="px-4 py-4 border-t border-[#dbcdbd] flex gap-3">
+            <button
+              onClick={() => setShowSettings(false)}
+              className="flex-1 py-3 rounded-xl border border-[#dbcdbd] text-[#100d09] text-[15px] hover:bg-[#FCF5E8]"
+              style={{ fontWeight: 500 }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                const trimmed = draftName.trim();
+                if (trimmed) setProfile({ name: trimmed });
+                setShowSettings(false);
+              }}
+              className="flex-1 py-3 rounded-xl bg-[#525a3f] text-white text-[15px] hover:bg-[#3f4530] active:scale-95 transition-all"
+              style={{ fontWeight: 500 }}
+            >
+              Save
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
