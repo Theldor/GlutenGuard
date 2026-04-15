@@ -5,7 +5,8 @@
       "Bash(npx vite:*)",
       "Bash(node_modules/.bin/vite build:*)",
       "Bash(npm run:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
