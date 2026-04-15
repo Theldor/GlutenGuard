@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router";
 import { Shield } from "lucide-react";
+import { useApp } from "../store";
 
 export function OnboardingWelcome() {
   const nav = useNavigate();
+  const { restoreAccount } = useApp();
   return (
     <div className="flex flex-col h-full bg-white px-6">
       <div className="flex-1 flex flex-col items-center justify-center gap-4">
@@ -20,7 +22,14 @@ export function OnboardingWelcome() {
           Get Started
         </button>
         <button 
-          onClick={() => nav("/explore")}
+          onClick={() => {
+            const restored = restoreAccount();
+            if (restored) {
+              nav("/explore");
+            } else {
+              nav("/onboarding/1");
+            }
+          }}
           className="w-full py-3 text-[#525a3f] bg-transparent"
         >
           I already have an account

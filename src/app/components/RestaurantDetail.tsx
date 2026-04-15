@@ -131,7 +131,7 @@ Best regards`;
           className="w-full flex items-center justify-center gap-2 py-3 bg-[#525a3f] rounded-lg text-white text-[15px]"
           style={{ fontWeight: 500 }}
         >
-          <Wallet size={18} /> View My Allergy Card
+          <Wallet size={18} /> Show My Allergy Card
         </button>
 
         {/* Secondary buttons - Chat and other actions */}

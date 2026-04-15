@@ -381,13 +381,13 @@ export function ExploreMap() {
 
         {/* Search */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1 flex items-center gap-2 bg-[#fcf5e9] rounded-lg px-3 py-2.5">
+          <div className="flex-1 flex items-center gap-2 bg-[#F2F2F2] rounded-lg px-3 py-2.5">
             <Search size={16} className="text-[#846848]" />
             <input className="flex-1 bg-transparent outline-none text-[14px]" placeholder="Search restaurants, cuisines..." />
           </div>
           <button
             onClick={() => nav("/explore/bookmarks")}
-            className="bg-[#fcf5e9] rounded-lg p-2.5 flex items-center justify-center shrink-0"
+            className="bg-[#F2F2F2] rounded-lg p-2.5 flex items-center justify-center shrink-0"
           >
             <Bookmark size={18} className="text-[#423424]" />
           </button>

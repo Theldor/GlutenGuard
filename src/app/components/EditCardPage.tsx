@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { useNavigate } from "react-router";
-import { X, Plus, Trash2, Edit2, Type, Eye, EyeOff } from "lucide-react";
+import { X, Plus, Trash2, Edit2, Bold, Eye, EyeOff } from "lucide-react";
 import { useApp } from "../store";
 
 interface CardSection {
@@ -8,6 +8,7 @@ interface CardSection {
   label: string;
   content: string;
   fontSize: number;
+  isBold: boolean;
   isVisible: boolean;
   isEditable: boolean; // Some sections like "Languages" shouldn't be editable via text
 }
@@ -23,6 +24,7 @@ export function EditCardPage() {
       label: "Languages I speak",
       content: profile.spokenLanguages || "English",
       fontSize: 16,
+      isBold: false,
       isVisible: true,
       isEditable: false,
     },
@@ -31,6 +33,7 @@ export function EditCardPage() {
       label: "Primary restriction",
       content: "I have celiac disease. I cannot eat anything containing wheat, barley, rye, or oats.",
       fontSize: 20,
+      isBold: false,
       isVisible: true,
       isEditable: true,
     },
@@ -39,6 +42,7 @@ export function EditCardPage() {
       label: "Cross-contamination warning",
       content: getCrossContaminationText(profile.crossContamination),
       fontSize: 18,
+      isBold: true,
       isVisible: true,
       isEditable: true,
     },
@@ -47,6 +51,7 @@ export function EditCardPage() {
       label: "Safe ingredients I CAN eat",
       content: "Rice, corn, potatoes, vegetables, fruit, meat, fish, eggs, dairy, beans",
       fontSize: 18,
+      isBold: true,
       isVisible: true,
       isEditable: true,
     },
@@ -54,6 +59,8 @@ export function EditCardPage() {
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
+  const [safeFoodTagsDraft, setSafeFoodTagsDraft] = useState<string[]>([]);
+  const [safeFoodInput, setSafeFoodInput] = useState("");
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
     profile.spokenLanguages?.split(", ") || ["English"]
@@ -68,30 +75,40 @@ export function EditCardPage() {
   const handleEditSection = (id: string, currentContent: string) => {
     setEditingSection(id);
     setEditingContent(currentContent);
+    if (id === "safe-foods") {
+      setSafeFoodTagsDraft(parseSafeFoodTags(currentContent));
+      setSafeFoodInput("");
+    }
   };
 
   const handleSaveEdit = (id: string) => {
+    const contentToSave =
+      id === "safe-foods" ? safeFoodTagsDraft.join(", ") : editingContent;
     setSections(sections.map(s =>
-      s.id === id ? { ...s, content: editingContent } : s
+      s.id === id ? { ...s, content: contentToSave } : s
     ));
     setEditingSection(null);
     setEditingContent("");
+    setSafeFoodTagsDraft([]);
+    setSafeFoodInput("");
   };
 
   const handleCancelEdit = () => {
     setEditingSection(null);
     setEditingContent("");
-  };
-
-  const handleFontSizeChange = (id: string, change: number) => {
-    setSections(sections.map(s =>
-      s.id === id ? { ...s, fontSize: Math.max(12, Math.min(28, s.fontSize + change)) } : s
-    ));
+    setSafeFoodTagsDraft([]);
+    setSafeFoodInput("");
   };
 
   const handleToggleVisibility = (id: string) => {
     setSections(sections.map(s =>
       s.id === id ? { ...s, isVisible: !s.isVisible } : s
+    ));
+  };
+
+  const handleToggleBold = (id: string) => {
+    setSections(sections.map(s =>
+      s.id === id ? { ...s, isBold: !s.isBold } : s
     ));
   };
 
@@ -105,10 +122,56 @@ export function EditCardPage() {
       label: "Custom section",
       content: "Add your content here",
       fontSize: 16,
+      isBold: false,
       isVisible: true,
       isEditable: true,
     };
     setSections([...sections, newSection]);
+  };
+
+  const addSafeFoodTags = (words: string[]) => {
+    if (words.length === 0) return;
+    setSafeFoodTagsDraft(prev => {
+      const next = [...prev];
+      words.forEach(word => {
+        const normalized = word.trim().replace(/,+$/, "");
+        if (normalized && !next.includes(normalized)) {
+          next.push(normalized);
+        }
+      });
+      return next;
+    });
+  };
+
+  const handleSafeFoodInputChange = (value: string) => {
+    const hasWhitespace = /\s/.test(value);
+    if (!hasWhitespace) {
+      setSafeFoodInput(value);
+      return;
+    }
+
+    const trailingWhitespace = /\s$/.test(value);
+    const parts = value.split(/\s+/);
+    const completed = trailingWhitespace ? parts : parts.slice(0, -1);
+    const remainder = trailingWhitespace ? "" : (parts[parts.length - 1] || "");
+
+    addSafeFoodTags(completed.filter(Boolean));
+    setSafeFoodInput(remainder);
+  };
+
+  const handleSafeFoodKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const trimmed = safeFoodInput.trim();
+      if (trimmed) {
+        addSafeFoodTags([trimmed]);
+        setSafeFoodInput("");
+      }
+    }
+  };
+
+  const removeSafeFoodTag = (tagToRemove: string) => {
+    setSafeFoodTagsDraft(prev => prev.filter(tag => tag !== tagToRemove));
   };
 
   const handleSaveLanguages = () => {
@@ -245,7 +308,7 @@ export function EditCardPage() {
                       <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
                           className="text-[#100d09] leading-relaxed"
-                          style={{ fontSize: `${section.fontSize}px` }}
+                          style={{ fontSize: `${section.fontSize}px`, fontWeight: section.isBold ? 600 : 400 }}
                         >
                           🔴 {section.content}
                         </p>
@@ -254,7 +317,7 @@ export function EditCardPage() {
                       <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
                           className="text-[#100d09] leading-relaxed"
-                          style={{ fontSize: `${section.fontSize}px`, fontWeight: 600 }}
+                          style={{ fontSize: `${section.fontSize}px`, fontWeight: section.isBold ? 600 : 400 }}
                         >
                           🔴 {section.content}
                         </p>
@@ -263,19 +326,24 @@ export function EditCardPage() {
                       <div>
                         <hr className="border-[#dbcdbd] mb-4" />
                         <div className="bg-[#fcf5e9] rounded-lg p-4">
-                          <p
-                            className="text-[#100d09] leading-relaxed"
-                            style={{ fontSize: `${section.fontSize}px`, fontWeight: 600 }}
-                          >
-                            🟢 {section.content}
-                          </p>
+                          <ul className="flex flex-wrap gap-2">
+                            {parseSafeFoodTags(section.content).map(tag => (
+                              <li
+                                key={tag}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-[#dbcdbd] text-[#100d09]"
+                                style={{ fontSize: `${section.fontSize}px`, fontWeight: section.isBold ? 600 : 400 }}
+                              >
+                                {tag}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
                     ) : section.id === "languages" ? (
                       <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
                           className="text-[#100d09] leading-relaxed"
-                          style={{ fontSize: `${section.fontSize}px` }}
+                          style={{ fontSize: `${section.fontSize}px`, fontWeight: section.isBold ? 600 : 400 }}
                         >
                           <span style={{ fontWeight: 600 }}>Languages I speak:</span> {section.content}
                         </p>
@@ -284,7 +352,7 @@ export function EditCardPage() {
                       <div className="bg-[#fcf5e9] rounded-lg p-4">
                         <p
                           className="text-[#100d09] leading-relaxed"
-                          style={{ fontSize: `${section.fontSize}px` }}
+                          style={{ fontSize: `${section.fontSize}px`, fontWeight: section.isBold ? 600 : 400 }}
                         >
                           {section.content}
                         </p>
@@ -332,7 +400,7 @@ export function EditCardPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleToggleVisibility(section.id)}
-                    className="p-1.5 hover:bg-[#fcf5e9] rounded"
+                    className="p-1.5 hover:bg-[#FCF5E8] rounded"
                   >
                     {section.isVisible ? (
                       <Eye size={16} className="text-[#423424]" />
@@ -343,7 +411,7 @@ export function EditCardPage() {
                   {section.id !== "languages" && section.id !== "primary" && (
                     <button
                       onClick={() => handleDeleteSection(section.id)}
-                      className="p-1.5 hover:bg-[#fcf5e9] rounded"
+                      className="p-1.5 hover:bg-[#FCF5E8] rounded"
                     >
                       <Trash2 size={16} className="text-[#DA1E28]" />
                     </button>
@@ -369,12 +437,42 @@ export function EditCardPage() {
                 ) : editingSection === section.id ? (
                   /* Edit Mode */
                   <div className="space-y-3">
-                    <textarea
-                      value={editingContent}
-                      onChange={(e) => setEditingContent(e.target.value)}
-                      className="w-full min-h-[120px] p-3 border border-[#dbcdbd] rounded-lg text-[16px] text-[#100d09] resize-y"
-                      placeholder="Enter content..."
-                    />
+                    {section.id === "safe-foods" ? (
+                      <div className="space-y-2">
+                        <ul className="flex flex-wrap gap-2">
+                          {safeFoodTagsDraft.map(tag => (
+                            <li
+                              key={tag}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#fcf5e9] border border-[#dbcdbd] text-[14px] text-[#100d09]"
+                            >
+                              <span>{tag}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeSafeFoodTag(tag)}
+                                className="text-[#846848] hover:text-[#423424]"
+                                aria-label={`Remove ${tag}`}
+                              >
+                                x
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                        <input
+                          value={safeFoodInput}
+                          onChange={(e) => handleSafeFoodInputChange(e.target.value)}
+                          onKeyDown={handleSafeFoodKeyDown}
+                          className="w-full p-3 border border-[#dbcdbd] rounded-lg text-[16px] text-[#100d09]"
+                          placeholder="Type ingredient then space..."
+                        />
+                      </div>
+                    ) : (
+                      <textarea
+                        value={editingContent}
+                        onChange={(e) => setEditingContent(e.target.value)}
+                        className="w-full min-h-[120px] p-3 border border-[#dbcdbd] rounded-lg text-[16px] text-[#100d09] resize-y"
+                        placeholder="Enter content..."
+                      />
+                    )}
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSaveEdit(section.id)}
@@ -393,31 +491,39 @@ export function EditCardPage() {
                 ) : (
                   /* View Mode */
                   <div className="space-y-3">
-                    <p
-                      className="text-[#100d09] leading-relaxed"
-                      style={{ fontSize: `${section.fontSize}px` }}
-                    >
-                      {section.content}
-                    </p>
+                    {section.id === "safe-foods" ? (
+                      <ul className="flex flex-wrap gap-2">
+                        {parseSafeFoodTags(section.content).map(tag => (
+                          <li
+                            key={tag}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#fcf5e9] border border-[#dbcdbd] text-[#100d09]"
+                            style={{ fontWeight: section.isBold ? 600 : 400 }}
+                          >
+                            <span>{tag}</span>
+                            <span className="text-[#846848]">x</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p
+                        className="text-[#100d09] leading-relaxed"
+                        style={{ fontSize: `${section.fontSize}px`, fontWeight: section.isBold ? 600 : 400 }}
+                      >
+                        {section.content}
+                      </p>
+                    )}
 
                     <div className="flex items-center gap-3 pt-2">
-                      {/* Font Size Controls */}
+                      {/* Text Style Controls */}
                       <div className="flex items-center gap-2">
-                        <Type size={14} className="text-[#423424]" />
                         <button
-                          onClick={() => handleFontSizeChange(section.id, -2)}
-                          className="w-7 h-7 flex items-center justify-center border border-[#dbcdbd] rounded text-[#100d09] hover:bg-[#fcf5e9]"
+                          onClick={() => handleToggleBold(section.id)}
+                          className={`w-8 h-8 flex items-center justify-center border rounded hover:bg-[#FCF5E8] ${
+                            section.isBold ? "border-[#525a3f] text-[#525a3f] bg-[#e7eae1]" : "border-[#dbcdbd] text-[#100d09]"
+                          }`}
+                          aria-label="Toggle bold text"
                         >
-                          −
-                        </button>
-                        <span className="text-[13px] text-[#423424] w-8 text-center">
-                          {section.fontSize}
-                        </span>
-                        <button
-                          onClick={() => handleFontSizeChange(section.id, 2)}
-                          className="w-7 h-7 flex items-center justify-center border border-[#dbcdbd] rounded text-[#100d09] hover:bg-[#fcf5e9]"
-                        >
-                          +
+                          <Bold size={14} />
                         </button>
                       </div>
 
@@ -458,6 +564,13 @@ export function EditCardPage() {
       </div>
     </div>
   );
+}
+
+function parseSafeFoodTags(content: string): string[] {
+  return content
+    .split(",")
+    .map(item => item.trim())
+    .filter(Boolean);
 }
 
 // Helper function to generate cross-contamination text based on profile

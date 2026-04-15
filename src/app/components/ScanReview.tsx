@@ -2,8 +2,6 @@ import { useNavigate, useLocation } from "react-router";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { BottomTabs } from "./BottomTabs";
-import menuPhoto from "@/assets/c9357aea2b88ca7fa509d1ef31ae7ab326906e6f.png";
-
 export function ScanReview() {
   const nav = useNavigate();
   const location = useLocation();
@@ -17,7 +15,7 @@ export function ScanReview() {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <div className="flex-1 overflow-auto pb-[168px]">
+      <div className="flex-1 overflow-auto pb-4">
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd] mt-4">
           <div className="flex items-center justify-between mb-3">
@@ -52,9 +50,8 @@ export function ScanReview() {
           <div className="px-4 pt-4 grid grid-cols-2 gap-3 mb-6">
             {photos.map((photo, index) => (
               <div key={photo} className="relative aspect-[4/3] bg-[#fcf5e9] rounded-lg border border-[#dbcdbd] overflow-hidden">
-                {/* Actual photo */}
                 <img 
-                  src={menuPhoto} 
+                  src={photo} 
                   alt={`Menu photo ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
@@ -84,9 +81,9 @@ export function ScanReview() {
         )}
       </div>
 
-      {/* Fixed bottom section with Analyze button - only show if photos exist */}
+      {/* Bottom section with Analyze button - only show if photos exist */}
       {photos.length > 0 && (
-        <div className="fixed bottom-[60px] inset-x-0 bg-white border-t border-[#dbcdbd] px-4 py-3">
+        <div className="bg-white border-t border-[#dbcdbd] px-4 py-3">
           <button
             onClick={() => nav("/scan/results")}
             className="w-full py-3 rounded-lg bg-[#525a3f] flex items-center justify-center text-white text-[15px] active:scale-95 transition-transform"
@@ -97,9 +94,7 @@ export function ScanReview() {
         </div>
       )}
 
-      <div className="fixed bottom-0 inset-x-0">
-        <BottomTabs />
-      </div>
+      <BottomTabs />
     </div>
   );
 }

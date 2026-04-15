@@ -50,7 +50,7 @@ export function ScanResults() {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd]">
+      <div className="px-4 pt-4 pb-3">
         {/* Back button on its own row - at the top */}
         <div className="mb-3">
           <button onClick={() => nav("/scan")} className="flex items-center justify-center w-8 h-8">
@@ -74,7 +74,7 @@ export function ScanResults() {
         </div>
         
         {/* Sort Toggle */}
-        <div className="mt-3 flex items-center justify-between bg-[#fcf5e9] rounded-lg p-2">
+        <div className="mt-3 flex items-center justify-between">
           <span className="text-[13px] text-[#423424]">Display order:</span>
           <div className="flex gap-1 bg-white rounded-md p-0.5">
             <button
@@ -102,13 +102,14 @@ export function ScanResults() {
       </div>
 
       {/* Accordion */}
-      <div className="flex-1 overflow-auto px-4 py-3">
+      <div className="flex-1 overflow-auto px-4 pb-3">
         {sortByOriginal ? (
           /* ==================== MENU ORDER VIEW ==================== */
-          <div className="space-y-2">
-            {[...safeItems, ...cautionItems, ...avoidItems]
-              .sort((a, b) => a.originalOrder - b.originalOrder)
-              .map((item) => {
+          <div className="border border-[#dbcdbd] rounded-2xl overflow-hidden bg-[#FCFCFC]">
+            <div className="space-y-4 px-4 py-3">
+              {[...safeItems, ...cautionItems, ...avoidItems]
+                .sort((a, b) => a.originalOrder - b.originalOrder)
+                .map((item) => {
                 // Determine item type
                 const isSafe = safeItems.includes(item as any);
                 const isCaution = cautionItems.includes(item as any);
@@ -117,34 +118,35 @@ export function ScanResults() {
                 const tagColor = isSafe ? "green" : isCaution ? "yellow" : "red";
                 const tagLabel = isSafe ? "Low Risk" : isCaution ? "Ask First" : "Avoid";
 
-                return (
-                  <button
-                    key={item.name}
-                    onClick={() => item.name === "Risotto ai Funghi" && nav("/scan/item")}
-                    className="w-full text-left bg-[#fcf5e9] rounded-lg p-3"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-baseline gap-2">
-                          <p className="text-[#100d09] text-[14px]">{item.name}</p>
-                          {item.price && <span className="text-[12px] text-[#846848]">{item.price}</span>}
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => item.name === "Risotto ai Funghi" && nav("/scan/item")}
+                      className="w-full text-left"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-baseline gap-2">
+                            <p className="text-[#100d09] text-[14px]">{item.name}</p>
+                            {item.price && <span className="text-[12px] text-[#846848]">{item.price}</span>}
+                          </div>
+                          <p className="text-[12px] text-[#846848]">{item.ingredients}</p>
+                          {isSafe && item.note && (
+                            <p className="text-[12px] text-[#967903] mt-1">{item.note}</p>
+                          )}
+                          {isCaution && (item as any).checkFor && (
+                            <p className="text-[12px] text-[#967903] mt-1">{(item as any).checkFor}</p>
+                          )}
+                          {isAvoid && (item as any).glutenSource && (
+                            <p className="text-[12px] text-[#967903] mt-1">Contains: {(item as any).glutenSource}</p>
+                          )}
                         </div>
-                        <p className="text-[12px] text-[#846848]">{item.ingredients}</p>
-                        {isSafe && item.note && (
-                          <p className="text-[12px] text-[#967903] mt-1">{item.note}</p>
-                        )}
-                        {isCaution && (item as any).checkFor && (
-                          <p className="text-[12px] text-[#967903] mt-1">{(item as any).checkFor}</p>
-                        )}
-                        {isAvoid && (item as any).glutenSource && (
-                          <p className="text-[12px] text-[#967903] mt-1">Contains: {(item as any).glutenSource}</p>
-                        )}
+                        <Tag color={tagColor} label={tagLabel} />
                       </div>
-                      <Tag color={tagColor} label={tagLabel} />
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
+            </div>
           </div>
         ) : (
           /* ==================== SAFETY ORDER VIEW (ACCORDION) ==================== */
@@ -158,12 +160,12 @@ export function ScanResults() {
           tagColor="green"
           tagLabel="Safe"
         >
-          <div className="bg-[#f9ebd2] rounded-lg p-3">
+          <div>
           {sortedSafeItems.map((item) => (
             <button
               key={item.name}
               onClick={() => item.name === "Risotto ai Funghi" && nav("/scan/item")}
-              className="w-full text-left py-2 mb-2 last:mb-0"
+              className="w-full text-left px-4 pb-3"
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -189,9 +191,9 @@ export function ScanResults() {
           tagColor="yellow"
           tagLabel="Caution"
         >
-          <div className="bg-[#f9ebd2] rounded-lg p-3">
+          <div>
           {sortedCautionItems.map((item) => (
-            <div key={item.name} className="mb-2 last:mb-0">
+            <div key={item.name} className="px-4 py-3">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
@@ -216,9 +218,9 @@ export function ScanResults() {
           tagColor="red"
           tagLabel="Avoid"
         >
-          <div className="bg-[#f9ebd2] rounded-lg p-3">
+          <div>
           {sortedAvoidItems.map((item) => (
-            <div key={item.name} className="mb-2 last:mb-0">
+            <div key={item.name} className="px-4 py-3">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
@@ -277,18 +279,20 @@ function AccordionSection({
   tagColor: string; tagLabel: string; children: React.ReactNode;
 }) {
   return (
-    <div className="mb-3">
+    <div className="mb-3 border border-[#dbcdbd] rounded-2xl overflow-hidden">
       <button
         onClick={toggle}
-        className="w-full flex items-center justify-between py-3 border-b border-[#dbcdbd]"
+        className="w-full flex items-center justify-between px-4 py-4 text-left bg-white hover:bg-[#FCF5E8]"
       >
         <div className="flex items-center gap-2">
-          <span className="text-[#100d09] text-[14px]">{header} ({count} items)</span>
+          <span className="text-[#100d09] text-[15px]" style={{ fontWeight: 500 }}>
+            {header} ({count} items)
+          </span>
           <Tag color={tagColor} label={tagLabel} />
         </div>
         {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
-      {open && <div className="pt-2">{children}</div>}
+      {open && <div className="bg-[#FCFCFC]">{children}</div>}
     </div>
   );
 }
@@ -386,7 +390,7 @@ function AllergyCardModal({ onClose }: { onClose: () => void }) {
           transform: isAnimating ? 'translateY(0)' : 'translateY(100%)',
         }}
       >
-        <AllergyCard />
+        <AllergyCard onClose={onClose} />
       </div>
     </>
   );
