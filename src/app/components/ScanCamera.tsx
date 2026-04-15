@@ -58,12 +58,12 @@ export function ScanCamera() {
     if (!ctx) return;
     ctx.drawImage(video, 0, 0);
 
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+    setPhotos((prev) => [...prev, dataUrl]);
+
     canvas.toBlob(
       (blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        setPhotos((prev) => [...prev, url]);
-        saveToAlbum(blob, `menu-${Date.now()}.jpg`);
+        if (blob) saveToAlbum(blob, `menu-${Date.now()}.jpg`);
       },
       "image/jpeg",
       0.92,
@@ -91,19 +91,25 @@ export function ScanCamera() {
     a.click();
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const urls = Array.from(files).map((f) => URL.createObjectURL(f));
-    setPhotos((prev) => [...prev, ...urls]);
+    const dataUrls = await Promise.all(
+      Array.from(files).map(
+        (f) =>
+          new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(f);
+          }),
+      ),
+    );
+    setPhotos((prev) => [...prev, ...dataUrls]);
     e.target.value = "";
   };
 
   const removePhoto = (i: number) => {
-    setPhotos((prev) => {
-      URL.revokeObjectURL(prev[i]);
-      return prev.filter((_, idx) => idx !== i);
-    });
+    setPhotos((prev) => prev.filter((_, idx) => idx !== i));
   };
 
   return (
