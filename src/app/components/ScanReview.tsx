@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router";
 import { X, Plus, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { BottomTabs } from "./BottomTabs";
+import { analyzeMenuPhotos, toDataURL } from "@/app/lib/analyzeMenu";
 export function ScanReview() {
   const nav = useNavigate();
   const location = useLocation();
