@@ -17,14 +17,33 @@ const MOCK_RESULTS: AnalysisResult = {
     { id: 4, name: "Grilled Vegetables", price: "$12", desc: "Seasonal vegetables, olive oil", tag: "Low Risk", ask: null },
   ],
   caution: [
-    { id: 5, name: "Bruschetta", price: "$10", desc: "Tomatoes, basil, garlic", tag: "Ask First", ask: "May offer GF bread option" },
-    { id: 6, name: "Minestrone Soup", price: "$9", desc: "Vegetables, beans, tomato broth", tag: "Ask First", ask: "May contain pasta" },
-    { id: 7, name: "Panna Cotta", price: "$11", desc: "Cream, vanilla, berry sauce", tag: "Ask First", ask: "Check for cookie crumble garnish" },
+    { id: 5, name: "Bruschetta", price: "$10", desc: "Tomatoes, basil, garlic", tag: "Ask First", ask: "May offer GF bread option — ask the server" },
+    { id: 6, name: "Minestrone Soup", price: "$9", desc: "Vegetables, beans, tomato broth", tag: "Ask First", ask: "Ask if it contains pasta or is made in a shared pot" },
+    { id: 7, name: "Panna Cotta", price: "$11", desc: "Cream, vanilla, berry sauce", tag: "Ask First", ask: "Ask if served with a cookie or biscuit garnish" },
     { id: 8, name: "Spaghetti Carbonara", price: "$22", desc: "Eggs, pancetta, pecorino cheese", tag: "High Risk", ask: "Contains wheat pasta" },
     { id: 9, name: "Tiramisu", price: "$12", desc: "Mascarpone, espresso, cocoa", tag: "High Risk", ask: "Ladyfinger cookies contain wheat flour" },
     { id: 10, name: "Focaccia Bread", price: "$6", desc: "Olive oil, rosemary, sea salt", tag: "High Risk", ask: "Made with wheat flour" },
     { id: 11, name: "Penne Arrabbiata", price: "$20", desc: "Tomato, garlic, chili", tag: "High Risk", ask: "Contains wheat pasta" },
-    { id: 12, name: "Breaded Veal Cutlet", price: "$32", desc: "Veal, lemon, arugula", tag: "High Risk", ask: "Wheat breadcrumbs" },
+    { id: 12, name: "Breaded Veal Cutlet", price: "$32", desc: "Veal, lemon, arugula", tag: "High Risk", ask: "Coated in wheat breadcrumbs" },
+  ],
+  menuOrder: [
+    { type: "heading", text: "Antipasti" },
+    { type: "item", id: 2 },
+    { type: "item", id: 5 },
+    { type: "heading", text: "Soups" },
+    { type: "item", id: 6 },
+    { type: "heading", text: "Mains" },
+    { type: "item", id: 1 },
+    { type: "item", id: 8 },
+    { type: "item", id: 11 },
+    { type: "item", id: 12 },
+    { type: "item", id: 3 },
+    { type: "heading", text: "Sides" },
+    { type: "item", id: 4 },
+    { type: "item", id: 10 },
+    { type: "heading", text: "Desserts" },
+    { type: "item", id: 7 },
+    { type: "item", id: 9 },
   ],
 };
 
@@ -109,8 +128,10 @@ export function ScanResults() {
   const askFirst = results.caution.filter((i) => i.tag === "Ask First");
   const avoid = results.caution.filter((i) => i.tag === "High Risk");
 
-  // All items merged for menu-order view
-  const allItems: AnalyzedMenuItem[] = [...results.safe, ...results.caution];
+  // Lookup map for menu-order view
+  const itemById = new Map<number, AnalyzedMenuItem>(
+    [...results.safe, ...results.caution].map((i) => [i.id, i])
+  );
 
   const toggle = (idx: number) => setOpenSection((prev) => (prev === idx ? -1 : idx));
 
@@ -158,25 +179,22 @@ export function ScanResults() {
       <div className="flex-1 overflow-auto px-4 py-3">
         {sortByOriginal ? (
           <div className="space-y-2">
-            {allItems.map((item) => (
-              <div key={item.id} className="bg-[#fcf5e9] rounded-lg p-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-2">
-                      <p className="text-[#100d09] text-[14px]">{item.name}</p>
-                      {item.price && <span className="text-[12px] text-[#846848]">{item.price}</span>}
-                    </div>
-                    <p className="text-[12px] text-[#846848]">{item.desc}</p>
-                    {item.ask && (
-                      <p className="text-[12px] text-[#967903] mt-1">
-                        {item.tag === "High Risk" ? `Contains: ${item.ask}` : `Ask: ${item.ask}`}
+            {results.menuOrder
+              ? results.menuOrder.map((entry, i) => {
+                  if (entry.type === "heading") {
+                    return (
+                      <p key={`h-${i}`} className="text-[11px] font-semibold text-[#525a3f] uppercase tracking-wider pt-3 pb-1 px-1">
+                        {entry.text}
                       </p>
-                    )}
-                  </div>
-                  <Tag tag={item.tag} />
-                </div>
-              </div>
-            ))}
+                    );
+                  }
+                  const item = itemById.get(entry.id!);
+                  if (!item) return null;
+                  return <MenuItem key={item.id} item={item} />;
+                })
+              : [...results.safe, ...results.caution].map((item) => (
+                  <MenuItem key={item.id} item={item} />
+                ))}
           </div>
         ) : (
           <>
