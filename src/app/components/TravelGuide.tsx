@@ -226,7 +226,7 @@ export function TravelGuide() {
                               e.stopPropagation();
                               handleEditTrip(trip);
                             }}
-                            className="w-full flex items-center gap-2 px-4 py-3 text-[14px] text-[#100d09] hover:bg-[#fcf5e9] transition-colors"
+                            className="w-full flex items-center gap-2 px-4 py-3 text-[14px] text-[#100d09] hover:bg-[#FCF5E8] transition-colors"
                           >
                             <Pencil size={14} />
                             Edit trip info
@@ -261,7 +261,7 @@ export function TravelGuide() {
                 setTripLocation("");
                 setTripStartDate("");
                 setTripEndDate("");
-              }} className="text-[#100d09] p-2 -ml-2 rounded-full hover:bg-[#fcf5e9]">
+              }} className="text-[#100d09] p-2 -ml-2 rounded-full hover:bg-[#FCF5E8]">
                 <ArrowLeft size={24} />
               </button>
               <h1 className="text-[20px] font-semibold text-[#100d09]">
@@ -431,7 +431,7 @@ export function TravelGuide() {
           <div className="flex flex-col h-full bg-[#fcf5e9]">
             <div className="bg-white px-4 py-4 shadow-sm z-10">
               <div className="flex items-center gap-3 mb-4">
-                <button onClick={() => setView('detail')} className="text-[#100d09] p-1 -ml-1 rounded hover:bg-[#fcf5e9]">
+                <button onClick={() => setView('detail')} className="text-[#100d09] p-1 -ml-1 rounded hover:bg-[#FCF5E8]">
                   <ArrowLeft size={24} />
                 </button>
                 <h2 className="text-[16px] font-medium text-[#100d09]">Search in {activeTrip.location.split(',')[0]}</h2>

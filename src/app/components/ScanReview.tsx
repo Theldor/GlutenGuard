@@ -2,8 +2,6 @@ import { useNavigate, useLocation } from "react-router";
 import { X, Plus, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { BottomTabs } from "./BottomTabs";
-import { toDataURL, analyzeMenuPhotos } from "@/app/lib/analyzeMenu";
-
 export function ScanReview() {
   const nav = useNavigate();
   const location = useLocation();
@@ -42,16 +40,7 @@ export function ScanReview() {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <input
-        ref={addRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={handleAdd}
-      />
-
-      <div className="flex-1 overflow-auto pb-[168px]">
+      <div className="flex-1 overflow-auto pb-4">
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd] mt-4">
           <div className="flex items-center justify-between mb-3">
@@ -93,13 +82,10 @@ export function ScanReview() {
           </div>
         ) : (
           <div className="px-4 pt-4 grid grid-cols-2 gap-3 mb-6">
-            {photos.map((src, index) => (
-              <div
-                key={index}
-                className="relative aspect-[4/3] bg-[#fcf5e9] rounded-lg border border-[#dbcdbd] overflow-hidden"
-              >
-                <img
-                  src={src}
+            {photos.map((photo, index) => (
+              <div key={photo} className="relative aspect-[4/3] bg-[#fcf5e9] rounded-lg border border-[#dbcdbd] overflow-hidden">
+                <img 
+                  src={photo} 
                   alt={`Menu photo ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
@@ -157,9 +143,9 @@ export function ScanReview() {
         )}
       </div>
 
-      {/* Fixed analyze button */}
+      {/* Bottom section with Analyze button - only show if photos exist */}
       {photos.length > 0 && (
-        <div className="fixed bottom-[60px] inset-x-0 bg-white border-t border-[#dbcdbd] px-4 py-3">
+        <div className="bg-white border-t border-[#dbcdbd] px-4 py-3">
           <button
             onClick={handleAnalyze}
             disabled={loading}
@@ -178,9 +164,7 @@ export function ScanReview() {
         </div>
       )}
 
-      <div className="fixed bottom-0 inset-x-0">
-        <BottomTabs />
-      </div>
+      <BottomTabs />
     </div>
   );
 }

@@ -1,87 +1,12 @@
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useApp } from "../store";
 import { ArrowLeft } from "lucide-react";
-
-const medicalConditions = [
-  "I'd rather not say",
-  "Celiac Disease",
-  "Gluten Sensitivity",
-  "Gluten Intolerance",
-  "A Wheat Allergy",
-  "Crohn's Disease",
-  "Hashimoto's Disease",
-  "IBS",
-  "FODMAP Intolerance",
-  "Eosinophilic Esophagitis",
-  "FPIES",
-  "Dermatitis Herpetiformis",
-  "Sjogren's Syndrome",
-  "Lupus",
-  "Gluten Ataxia",
-  "Lymphocytic Esophagitis",
-  "Lyme Disease",
-  "Graves Disease",
-  "Ulcerative Colitis",
-  "Endometriosis",
-  "Auto-Brewery Syndrome",
-  "Multiple Sclerosis",
-  "Fibromyalgia",
-  "Rheumatoid Arthritis",
-  "MTHFR",
-  "MCAS",
-  "Other",
-];
-
-const questions = [
-  {
-    q: "What brought you here today?",
-    key: "reason" as const,
-    type: "checkbox" as const,
-    options: [
-      { title: "Eating out safely", sub: "I want help navigating restaurant menus" },
-      { title: "Traveling with celiac", sub: "I need support dining in unfamiliar places" },
-      { title: "I'm newly diagnosed", sub: "I want to learn what's safe" },
-      { title: "Helping someone I know", sub: "A friend or family member has celiac" },
-    ],
-  },
-  {
-    q: "I'm gluten free because:",
-    key: "condition" as const,
-    type: "dropdown" as const,
-    textInputLabel: "Other dietary preferences",
-    textInputKey: "otherDietaryPreferences" as const,
-  },
-  {
-    q: "Are you symptomatic?",
-    key: "symptomatic" as const,
-    type: "radio" as const,
-    options: [
-      { title: "Rarely", sub: "" },
-      { title: "Sometimes", sub: "" },
-      { title: "Always", sub: "" },
-      { title: "Severely", sub: "" },
-    ],
-    textInputLabel: "Additional comments",
-    textInputKey: "symptomNotes" as const,
-  },
-  {
-    q: "How strictly do you avoid cross-contact?",
-    key: "crossContamination" as const,
-    type: "radio" as const,
-    options: [
-      { title: "I'd rather not say", sub: "" },
-      { title: "Not concerned", sub: "" },
-      { title: "Avoid if possible", sub: "" },
-      { title: "Pretty strict", sub: "" },
-      { title: "Very strict", sub: "" },
-    ],
-    textInputLabel: "Additional comments",
-    textInputKey: "crossContaminationNotes" as const,
-  },
-];
+import { medicalConditions, questions } from "../onboardingData";
 
 export function OnboardingQuestion() {
   const { step } = useParams();
+  const [searchParams] = useSearchParams();
+  const fromProfile = searchParams.get("from") === "profile";
   const stepNum = parseInt(step || "1") - 1;
   const nav = useNavigate();
   const { profile, setProfile } = useApp();
@@ -98,14 +23,20 @@ export function OnboardingQuestion() {
   const selectedArray = data.type === "checkbox" ? (profile[data.key as keyof typeof profile] as number[]) : [];
   const textValue = data.textInputKey ? (profile[data.textInputKey] as string) : "";
 
+  const qs = fromProfile ? "?from=profile" : "";
+
   const next = () => {
-    if (stepNum < 3) nav(`/onboarding/${stepNum + 2}`);
+    if (stepNum < 3) nav(`/onboarding/${stepNum + 2}${qs}`);
+    else if (fromProfile) nav("/profile");
     else nav("/onboarding/card");
   };
 
   const back = () => {
-    if (stepNum === 0) nav("/");
-    else nav(`/onboarding/${stepNum}`);
+    if (stepNum === 0) {
+      nav(fromProfile ? "/profile" : "/");
+    } else {
+      nav(`/onboarding/${stepNum}${qs}`);
+    }
   };
 
   const canContinue = data.type === "dropdown"
@@ -250,7 +181,7 @@ export function OnboardingQuestion() {
           disabled={!canContinue}
           className="w-full py-3.5 bg-[#525a3f] text-white rounded-lg disabled:opacity-40"
         >
-          Continue
+          {fromProfile && stepNum === 3 ? "Save & Return" : "Continue"}
         </button>
         <button onClick={next} className="w-full py-3 text-[#525a3f] bg-transparent">
           Skip

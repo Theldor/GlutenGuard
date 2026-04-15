@@ -114,7 +114,7 @@ export function ContactRestaurant() {
                   <button
                     key={l}
                     onClick={() => { setLanguage(l); setLangOpen(false); }}
-                    className={`w-full text-left px-3 py-2 text-[14px] hover:bg-[#fcf5e9] ${language === l ? "text-[#525a3f]" : "text-[#100d09]"}`}
+                    className={`w-full text-left px-3 py-2 text-[14px] hover:bg-[#FCF5E8] ${language === l ? "text-[#525a3f]" : "text-[#100d09]"}`}
                   >
                     {l}
                   </button>

@@ -138,7 +138,8 @@ export function ScanResults() {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 border-b border-[#dbcdbd]">
+      <div className="px-4 pt-4 pb-3">
+        {/* Back button on its own row - at the top */}
         <div className="mb-3">
           <button onClick={() => nav("/scan/review")} className="flex items-center justify-center w-8 h-8">
             <ArrowLeft size={20} />
@@ -155,9 +156,9 @@ export function ScanResults() {
         <div className="bg-[#f3f5f0] border border-[#b8c0a5] rounded-lg p-3 mt-2">
           <p className="text-[13px] text-[#373c2a]">{results.banner}</p>
         </div>
-
-        {/* Sort toggle */}
-        <div className="mt-3 flex items-center justify-between bg-[#fcf5e9] rounded-lg p-2">
+        
+        {/* Sort Toggle */}
+        <div className="mt-3 flex items-center justify-between">
           <span className="text-[13px] text-[#423424]">Display order:</span>
           <div className="flex gap-1 bg-white rounded-md p-0.5">
             {[["By Safety", false], ["Menu Order", true]].map(([label, val]) => (
@@ -175,64 +176,140 @@ export function ScanResults() {
         </div>
       </div>
 
-      {/* Item list */}
-      <div className="flex-1 overflow-auto px-4 py-3">
+      {/* Accordion */}
+      <div className="flex-1 overflow-auto px-4 pb-3">
         {sortByOriginal ? (
-          <div className="space-y-2">
-            {results.menuOrder
-              ? results.menuOrder.map((entry, i) => {
-                  if (entry.type === "heading") {
-                    return (
-                      <p key={`h-${i}`} className="text-[11px] font-semibold text-[#525a3f] uppercase tracking-wider pt-3 pb-1 px-1">
-                        {entry.text}
-                      </p>
-                    );
-                  }
-                  const item = itemById.get(entry.id!);
-                  if (!item) return null;
-                  return <MenuItem key={item.id} item={item} />;
-                })
-              : [...results.safe, ...results.caution].map((item) => (
-                  <MenuItem key={item.id} item={item} />
-                ))}
+          /* ==================== MENU ORDER VIEW ==================== */
+          <div className="border border-[#dbcdbd] rounded-2xl overflow-hidden bg-[#FCFCFC]">
+            <div className="space-y-4 px-4 py-3">
+              {[...safeItems, ...cautionItems, ...avoidItems]
+                .sort((a, b) => a.originalOrder - b.originalOrder)
+                .map((item) => {
+                // Determine item type
+                const isSafe = safeItems.includes(item as any);
+                const isCaution = cautionItems.includes(item as any);
+                const isAvoid = avoidItems.includes(item as any);
+                
+                const tagColor = isSafe ? "green" : isCaution ? "yellow" : "red";
+                const tagLabel = isSafe ? "Low Risk" : isCaution ? "Ask First" : "Avoid";
+
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => item.name === "Risotto ai Funghi" && nav("/scan/item")}
+                      className="w-full text-left"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-baseline gap-2">
+                            <p className="text-[#100d09] text-[14px]">{item.name}</p>
+                            {item.price && <span className="text-[12px] text-[#846848]">{item.price}</span>}
+                          </div>
+                          <p className="text-[12px] text-[#846848]">{item.ingredients}</p>
+                          {isSafe && item.note && (
+                            <p className="text-[12px] text-[#967903] mt-1">{item.note}</p>
+                          )}
+                          {isCaution && (item as any).checkFor && (
+                            <p className="text-[12px] text-[#967903] mt-1">{(item as any).checkFor}</p>
+                          )}
+                          {isAvoid && (item as any).glutenSource && (
+                            <p className="text-[12px] text-[#967903] mt-1">Contains: {(item as any).glutenSource}</p>
+                          )}
+                        </div>
+                        <Tag color={tagColor} label={tagLabel} />
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
           </div>
         ) : (
           <>
-            {results.safe.length > 0 && (
-              <AccordionSection
-                open={openSection === 0}
-                toggle={() => toggle(0)}
-                header="✅ Safe Options"
-                count={results.safe.length}
-                tagColor="Low Risk"
-              >
-                {results.safe.map((item) => <MenuItem key={item.id} item={item} />)}
-              </AccordionSection>
-            )}
+        {/* Safe */}
+        <AccordionSection
+          open={open === 0}
+          toggle={() => setOpen(open === 0 ? -1 : 0)}
+          header="✅ Safe Options"
+          count={4}
+          tagColor="green"
+          tagLabel="Safe"
+        >
+          <div>
+          {sortedSafeItems.map((item) => (
+            <button
+              key={item.name}
+              onClick={() => item.name === "Risotto ai Funghi" && nav("/scan/item")}
+              className="w-full text-left px-4 pb-3"
+            >
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-[#100d09] text-[14px]">{item.name}</p>
+                    {item.price && <span className="text-[12px] text-[#846848]">{item.price}</span>}
+                  </div>
+                  <p className="text-[12px] text-[#846848]">{item.ingredients}</p>
+                  {item.note && <p className="text-[12px] text-[#967903] mt-1">{item.note}</p>}
+                </div>
+                <Tag color="green" label="Low Risk" />
+              </div>
+            </button>
+          ))}
+          </div>
+        </AccordionSection>
 
-            {askFirst.length > 0 && (
-              <AccordionSection
-                open={openSection === 1}
-                toggle={() => toggle(1)}
-                header="⚠️ Ask First"
-                count={askFirst.length}
-                tagColor="Ask First"
-              >
-                {askFirst.map((item) => <MenuItem key={item.id} item={item} />)}
-              </AccordionSection>
-            )}
+        <AccordionSection
+          open={open === 1}
+          toggle={() => setOpen(open === 1 ? -1 : 1)}
+          header="⚠️ Ask First"
+          count={3}
+          tagColor="yellow"
+          tagLabel="Caution"
+        >
+          <div>
+          {sortedCautionItems.map((item) => (
+            <div key={item.name} className="px-4 py-3">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-[#100d09] text-[14px]">{item.name}</p>
+                    {item.price && <span className="text-[12px] text-[#846848]">{item.price}</span>}
+                  </div>
+                  <p className="text-[12px] text-[#846848]">{item.ingredients}</p>
+                  <p className="text-[12px] text-[#967903] mt-1">{item.checkFor}</p>
+                </div>
+                <Tag color="yellow" label="Ask First" />
+              </div>
+            </div>
+          ))}
+          </div>
+        </AccordionSection>
 
-            {avoid.length > 0 && (
-              <AccordionSection
-                open={openSection === 2}
-                toggle={() => toggle(2)}
-                header="🚫 Avoid"
-                count={avoid.length}
-                tagColor="High Risk"
-              >
-                {avoid.map((item) => <MenuItem key={item.id} item={item} />)}
-              </AccordionSection>
-            )}
+        <AccordionSection
+          open={open === 2}
+          toggle={() => setOpen(open === 2 ? -1 : 2)}
+          header="🚫 Avoid"
+          count={5}
+          tagColor="red"
+          tagLabel="Avoid"
+        >
+          <div>
+          {sortedAvoidItems.map((item) => (
+            <div key={item.name} className="px-4 py-3">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-[#100d09] text-[14px]">{item.name}</p>
+                    {item.price && <span className="text-[12px] text-[#846848]">{item.price}</span>}
+                  </div>
+                  <p className="text-[12px] text-[#846848]">{item.ingredients}</p>
+                  <p className="text-[12px] text-[#967903] mt-1">Contains: {item.glutenSource}</p>
+                </div>
+                <Tag color="red" label="Avoid" />
+              </div>
+            </div>
+          ))}
+          </div>
+        </AccordionSection>
           </>
         )}
       </div>
@@ -263,7 +340,31 @@ export function ScanResults() {
   );
 }
 
-// ─── AI Support screen ────────────────────────────────────────────────────────
+function AccordionSection({
+  open, toggle, header, count, tagColor, tagLabel, children,
+}: {
+  open: boolean; toggle: () => void; header: string; count: number;
+  tagColor: string; tagLabel: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="mb-3 border border-[#dbcdbd] rounded-2xl overflow-hidden">
+      <button
+        onClick={toggle}
+        className="w-full flex items-center justify-between px-4 py-4 text-left bg-white hover:bg-[#FCF5E8]"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[#100d09] text-[15px]" style={{ fontWeight: 500 }}>
+            {header} ({count} items)
+          </span>
+          <Tag color={tagColor} label={tagLabel} />
+        </div>
+        {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+      </button>
+      {open && <div className="bg-[#FCFCFC]">{children}</div>}
+    </div>
+  );
+}
+
 function AISupportScreen({ onClose }: { onClose: () => void }) {
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-white">
@@ -316,13 +417,7 @@ function AllergyCardModal({ onClose }: { onClose: () => void }) {
         className="absolute inset-0 z-50 flex flex-col bg-white rounded-t-3xl transition-transform duration-[800ms] ease-out"
         style={{ transform: isAnimating ? "translateY(0)" : "translateY(100%)" }}
       >
-        <AllergyCard />
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#f0ede8]"
-        >
-          <X size={16} className="text-[#100d09]" />
-        </button>
+        <AllergyCard onClose={onClose} />
       </div>
     </>
   );

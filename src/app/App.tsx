@@ -1,6 +1,20 @@
 import { RouterProvider } from "react-router";
 import { router } from "./routes";
-import { AppProvider } from "./store";
+import { AppProvider, useApp } from "./store";
+import { useEffect } from "react";
+
+function AutoRedirect() {
+  const { onboardingComplete } = useApp();
+
+  useEffect(() => {
+    // Only redirect from the root welcome screen, not mid-onboarding pages
+    if (onboardingComplete && window.location.pathname === "/") {
+      router.navigate("/scan", { replace: true });
+    }
+  }, [onboardingComplete]);
+
+  return null;
+}
 
 export default function App() {
   return (
@@ -9,6 +23,7 @@ export default function App() {
         className="mx-auto h-screen max-w-[430px] bg-white relative overflow-hidden"
         style={{ fontFamily: "'Geist', sans-serif" }}
       >
+        <AutoRedirect />
         <RouterProvider router={router} />
       </div>
     </AppProvider>

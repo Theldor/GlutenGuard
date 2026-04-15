@@ -89,7 +89,7 @@ const translations: Record<
   },
 };
 
-export function AllergyCard() {
+export function AllergyCard({ onClose }: { onClose?: () => void } = {}) {
   const nav = useNavigate();
   const { profile } = useApp();
   const [lang, setLang] = useState("ja");
@@ -136,7 +136,7 @@ export function AllergyCard() {
           <p className="text-[13px] text-[#846848]">
             Show this to your server
           </p>
-          <button onClick={() => nav("/scan/results")}>
+          <button onClick={() => (onClose ? onClose() : nav("/scan/results"))}>
             <X size={20} />
           </button>
         </div>
@@ -147,7 +147,7 @@ export function AllergyCard() {
           <>
             {translations.en.cardTitle}
             {lang !== "en" && (
-              <span className="text-[#a4825b] ml-2">
+              <span className="text-[#A6A6A6] ml-2">
                 {t.cardTitle}
               </span>
             )}
@@ -163,7 +163,7 @@ export function AllergyCard() {
               onClick={() =>
                 setShowLangDropdown(!showLangDropdown)
               }
-              className="flex items-center gap-2 px-4 py-2 bg-[#fcf5e9] rounded-lg text-[15px] text-[#423424]"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-[#dbcdbd] rounded-lg text-[15px] text-[#423424]"
             >
               <span className="text-[20px]">{t.flag}</span>
               <span>{t.label}</span>
@@ -172,7 +172,7 @@ export function AllergyCard() {
 
             <button
               onClick={handleEdit}
-              className="flex items-center gap-1.5 px-3 py-2 text-[#525a3f] text-[14px] hover:bg-[#fcf5e9] rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-[#525a3f] text-[14px] hover:bg-[#FCF5E8] rounded-lg transition-colors"
             >
               <Edit2 size={14} /> Edit my card
             </button>
@@ -187,7 +187,7 @@ export function AllergyCard() {
                         setLang(k);
                         setShowLangDropdown(false);
                       }}
-                      className={`w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-[#fcf5e9] ${k === lang ? "bg-[#dbcdbd]" : ""}`}
+                      className={`w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-[#FCF5E8] ${k === lang ? "bg-[#dbcdbd]" : ""}`}
                     >
                       <span className="text-[20px]">
                         {v.flag}
@@ -205,7 +205,7 @@ export function AllergyCard() {
           {/* Languages I speak */}
           {profile.spokenLanguages && (
             <div className="space-y-2">
-              <div className="bg-[#fcf5e9] rounded-lg p-4">
+              <div className="bg-[#F9F9F9] rounded-lg p-4">
                 <p className="text-[16px] text-[#100d09] leading-relaxed">
                   <span style={{ fontWeight: 600 }}>Languages I speak:</span> {profile.spokenLanguages}
                 </p>
@@ -215,13 +215,13 @@ export function AllergyCard() {
 
           {/* Title + Can't eat combined */}
           <div className="space-y-2">
-            <div className="bg-[#fcf5e9] rounded-lg p-4">
+            <div className="bg-[#F9F9F9] rounded-lg p-4">
               <p className="text-[20px] text-[#100d09] leading-relaxed">
                 🔴 {t.content.title} {t.content.cant}
               </p>
             </div>
             {lang !== "en" && (
-              <p className="text-[14px] text-[#a4825b]">
+              <p className="text-[14px] text-[#A6A6A6]">
                 {englishContent.title} {englishContent.cant}
               </p>
             )}
@@ -229,7 +229,7 @@ export function AllergyCard() {
 
           {/* Cross-contamination warning - now using profile-specific text */}
           <div className="space-y-2">
-            <div className="bg-[#fcf5e9] rounded-lg p-4">
+            <div className="bg-[#F9F9F9] rounded-lg p-4">
               <p
                 className="text-[18px] text-[#100d09] leading-relaxed"
                 style={{ fontWeight: 600 }}
@@ -239,7 +239,7 @@ export function AllergyCard() {
             </div>
             {lang !== "en" && (
               <p
-                className="text-[14px] text-[#a4825b]"
+                className="text-[14px] text-[#A6A6A6]"
                 style={{ fontWeight: 600 }}
               >
                 {crossContaminationText}
@@ -251,7 +251,7 @@ export function AllergyCard() {
 
           {/* Can eat + Can eat list combined */}
           <div className="space-y-2">
-            <div className="bg-[#fcf5e9] rounded-lg p-4">
+            <div className="bg-[#F9F9F9] rounded-lg p-4">
               <p
                 className="text-[20px] text-[#100d09] leading-relaxed"
                 style={{ fontWeight: 600 }}
@@ -261,7 +261,7 @@ export function AllergyCard() {
             </div>
             {lang !== "en" && (
               <p
-                className="text-[14px] text-[#a4825b]"
+                className="text-[14px] text-[#A6A6A6]"
                 style={{ fontWeight: 600 }}
               >
                 {englishContent.can} {englishContent.canList}
