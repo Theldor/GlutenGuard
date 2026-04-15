@@ -147,7 +147,7 @@ export function ScanReview() {
               onChange={(e) => setNote(e.target.value)}
               disabled={loading}
               placeholder="Any additional dietary needs or context…"
-              className="w-full bg-[#fcf5e9] border border-[#dbcdbd] rounded-lg px-4 py-3 text-[#100d09] placeholder:text-[#a4825b] text-[14px] outline-none focus:ring-2 focus:ring-[#525a3f] transition-all resize-none disabled:opacity-60"
+              className="w-full bg-[#fcf5e9] border border-[#dbcdbd] rounded-lg px-4 py-3 text-[#100d09] placeholder:text-[#a4825b] text-[16px] outline-none focus:ring-2 focus:ring-[#525a3f] transition-all resize-none disabled:opacity-60"
               rows={3}
             />
           </div>

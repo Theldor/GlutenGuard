@@ -3,6 +3,7 @@ import { BottomTabs } from "./BottomTabs";
 import { CreditCard, Settings, HelpCircle, LogOut, CheckCircle, AlertCircle, AlertTriangle, Edit2, X, Plus, ChevronDown, History, Menu } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useState, type KeyboardEvent } from "react";
+import { useKeyboardOffset } from "../hooks/useKeyboardOffset";
 import { medicalConditions, questions } from "../onboardingData";
 
 const symptomLabels = ["Rarely", "Sometimes", "Always", "Severely"];
@@ -38,6 +39,7 @@ export function Profile() {
   const [showBlockListModal, setShowBlockListModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [draftName, setDraftName] = useState(profile.name);
+  const keyboardOffset = useKeyboardOffset();
 
   const sympIdx = Math.max(0, profile.symptomatic);
   const badge = riskBadge(profile.symptomatic);
@@ -295,7 +297,7 @@ export function Profile() {
                 value={draftName}
                 onChange={(e) => setDraftName(e.target.value)}
                 placeholder="Your name"
-                className="w-full bg-[#F9F9F9] border border-[#dbcdbd] rounded-xl px-4 py-3 text-[15px] text-[#100d09] placeholder:text-[#A6A6A6] outline-none focus:ring-2 focus:ring-[#525a3f] transition-all"
+                className="w-full bg-[#F9F9F9] border border-[#dbcdbd] rounded-xl px-4 py-3 text-[16px] text-[#100d09] placeholder:text-[#A6A6A6] outline-none focus:ring-2 focus:ring-[#525a3f] transition-all"
               />
               <p className="text-[12px] text-[#A6A6A6] mt-1.5">
                 Used in your profile header and allergy card.
@@ -303,7 +305,10 @@ export function Profile() {
             </div>
           </div>
 
-          <div className="px-4 py-4 border-t border-[#dbcdbd] flex gap-3">
+          <div
+            className="px-4 border-t border-[#dbcdbd] flex gap-3 transition-[padding] duration-200"
+            style={{ paddingTop: 16, paddingBottom: Math.max(16, keyboardOffset) }}
+          >
             <button
               onClick={() => setShowSettings(false)}
               className="flex-1 py-3 rounded-xl border border-[#dbcdbd] text-[#100d09] text-[15px] hover:bg-[#FCF5E8]"
@@ -424,7 +429,7 @@ function BlockListModal({
             value={input}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full p-3 border border-[#dbcdbd] rounded-lg text-[15px] text-[#100d09] focus:border-[#525a3f] focus:outline-none"
+              className="w-full p-3 border border-[#dbcdbd] rounded-lg text-[16px] text-[#100d09] focus:border-[#525a3f] focus:outline-none"
             placeholder="Type ingredient then space…"
             autoFocus
           />
@@ -603,7 +608,7 @@ function OnboardingEditModal({
               <textarea
                 value={textValue}
                 onChange={(e) => applyLocal({ [data.textInputKey!]: e.target.value })}
-                className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] focus:border-[#525a3f] focus:outline-none min-h-[100px] resize-none"
+                className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] focus:border-[#525a3f] focus:outline-none min-h-[100px] resize-none text-[16px]"
                 placeholder="Optional"
               />
             </div>

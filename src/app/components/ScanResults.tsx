@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useKeyboardOffset } from "../hooks/useKeyboardOffset";
 import { useNavigate, useLocation } from "react-router";
 import { ArrowLeft, ChevronDown, ChevronUp, Wallet, MessageCircle, ImagePlus, Loader2, Send, X } from "lucide-react";
 import { BottomTabs } from "./BottomTabs";
@@ -201,6 +202,27 @@ export function ScanResults() {
             {results.cuisine}
           </span>
         </div>
+
+        {/* Display order — fixed under restaurant on mobile only */}
+        <div className="mt-3 flex items-center justify-between md:hidden">
+          <span className="text-[13px] text-[#423424]">Display order:</span>
+          <div className="flex gap-1 bg-white rounded-md p-0.5 border border-[#dbcdbd]">
+            {(["By Safety", "Menu Order"] as const).map((label, i) => (
+              <button
+                key={`mobile-${label}`}
+                type="button"
+                onClick={() => setSortByOriginal(i === 1)}
+                className={`px-3 py-1 rounded text-[12px] transition-colors ${
+                  sortByOriginal === (i === 1)
+                    ? "bg-[#525a3f] text-white"
+                    : "text-[#423424]"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Scrollable content */}
@@ -211,8 +233,9 @@ export function ScanResults() {
             <p className="text-[13px] text-[#6b5530] leading-snug">
               Results are generic because you haven't set up your dietary profile yet.{" "}
               <button
+                type="button"
                 onClick={() => nav("/profile")}
-                className="underline font-medium text-[#525a3f]"
+                className="text-[13px] leading-snug underline font-medium text-[#525a3f] align-baseline"
               >
                 Set up my profile
               </button>{" "}
@@ -225,13 +248,14 @@ export function ScanResults() {
           <p className="text-[13px] text-[#373c2a]">{results.banner}</p>
         </div>
 
-        {/* Sort toggle */}
-        <div className="flex items-center justify-between mb-3">
+        {/* Display order — scrollable on md+ only (mobile uses fixed header row) */}
+        <div className="hidden md:flex items-center justify-between mb-3">
           <span className="text-[13px] text-[#423424]">Display order:</span>
-          <div className="flex gap-1 bg-white rounded-md p-0.5">
+          <div className="flex gap-1 bg-white rounded-md p-0.5 border border-[#dbcdbd]">
             {(["By Safety", "Menu Order"] as const).map((label, i) => (
               <button
                 key={label}
+                type="button"
                 onClick={() => setSortByOriginal(i === 1)}
                 className={`px-3 py-1 rounded text-[12px] transition-colors ${
                   sortByOriginal === (i === 1)
@@ -411,7 +435,7 @@ function AISupportScreenModal({
         onClick={handleClose}
       />
       <div
-        className="absolute inset-0 z-50 flex flex-col bg-white rounded-t-3xl transition-transform duration-500 ease-out overflow-hidden"
+        className="absolute inset-0 z-50 flex flex-col bg-white transition-transform duration-500 ease-out overflow-hidden"
         style={{ transform: isVisible ? "translateY(0)" : "translateY(100%)" }}
       >
         <AISupportScreen results={results} userNote={userNote} onClose={handleClose} />
@@ -431,6 +455,7 @@ function AISupportScreen({
   onClose: () => void;
 }) {
   const { profile } = useApp();
+  const keyboardOffset = useKeyboardOffset();
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [pendingImage, setPendingImage] = useState<string | null>(null);
@@ -540,7 +565,7 @@ function AISupportScreen({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-5 pb-3 border-b border-[#dbcdbd]">
+      <div className="flex items-center justify-between px-4 pt-5 pb-3 border-b border-[#E5E5E5]">
         <h1 className="text-[28px] text-[#100d09]" style={{ fontWeight: 700 }}>AI Support</h1>
         <button
           onClick={onClose}
@@ -611,7 +636,7 @@ function AISupportScreen({
       {/* Pending image preview */}
       {pendingImage && (
         <div className="px-4 pb-2 flex items-center gap-2">
-          <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-[#dbcdbd]">
+          <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-[#E5E5E5]">
             <img src={pendingImage} alt="Pending" className="w-full h-full object-cover" />
             <button
               onClick={() => setPendingImage(null)}
@@ -624,8 +649,11 @@ function AISupportScreen({
         </div>
       )}
 
-      {/* Input bar */}
-      <div className="border-t border-[#dbcdbd] px-4 py-3 pb-6 flex items-center gap-2 shrink-0">
+      {/* Input bar — lifts by keyboard height */}
+      <div
+        className="border-t border-[#E5E5E5] px-4 py-3 flex items-center gap-2 shrink-0 transition-[padding] duration-200"
+        style={{ paddingBottom: `${Math.max(12, keyboardOffset)}px` }}
+      >
         <input
           ref={fileRef}
           type="file"
@@ -645,7 +673,7 @@ function AISupportScreen({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={loading}
-          className="flex-1 bg-[#F2F2F2] rounded-full px-4 py-2.5 text-[14px] outline-none disabled:opacity-60"
+          className="flex-1 bg-[#F2F2F2] rounded-full px-4 py-2.5 text-[16px] outline-none disabled:opacity-60"
           placeholder="Ask about this menu…"
         />
         <button
