@@ -11,7 +11,13 @@
       "Bash(curl -sI https://theldor.github.io/GlutenGuard/)",
       "Bash(curl -s https://theldor.github.io/GlutenGuard/)",
       "Bash(curl -sI https://theldor.github.io/GlutenGuard/assets/index-BEpWQMsG.js)",
-      "Bash(curl -sI https://theldor.github.io/GlutenGuard/assets/index-DLHEw1Hf.css)"
+      "Bash(curl -sI https://theldor.github.io/GlutenGuard/assets/index-DLHEw1Hf.css)",
+      "Bash(curl -sI \"https://theldor.github.io/GlutenGuard/?$\\(date +%s\\)\")",
+      "Bash(curl -sI \"https://theldor.github.io/GlutenGuard/\")",
+      "Bash(Grep -n hash)",
+      "Bash(Grep -n \"handleFileSelect\\\\|handleFiles\" /Users/theldor/Desktop/GlutenGuard/GlutenGuard/src/app/components/ScanCamera.tsx)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)"
     ]
   }
 }
