@@ -29,42 +29,78 @@ export const toDataURL = (file: File): Promise<string> =>
     reader.readAsDataURL(file);
   });
 
-export const analyzeMenuPhotos = async (
-  photos: string[],
-  note: string
-): Promise<AnalysisResult> => {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+export interface ProfileContext {
+  condition: string;
+  customBlockedIngredients: string[];
+  additionalRestrictions: string[];
+  symptomatic: number;
+  crossContamination: number;
+  otherDietaryPreferences: string;
+}
 
-  const prompt = `You are a celiac disease dietary assistant. Analyze this restaurant menu and classify every item for someone with celiac disease.
+function buildAnalysisPrompt(note: string, profile?: ProfileContext): string {
+  const hasCondition = profile?.condition && profile.condition.length > 0;
+  const blocked = profile?.customBlockedIngredients ?? [];
+  const restrictions = profile?.additionalRestrictions ?? [];
+  const otherPrefs = profile?.otherDietaryPreferences ?? "";
+
+  const conditionLabel = hasCondition ? profile.condition : "celiac disease";
+
+  const crossContactStrictness = ["not specified", "not concerned", "avoid if possible", "pretty strict", "very strict"];
+  const strictness =
+    profile && profile.crossContamination >= 0
+      ? crossContactStrictness[profile.crossContamination] ?? "not specified"
+      : "not specified";
+
+  let profileSection = `The user has: ${conditionLabel}.`;
+  if (strictness !== "not specified")
+    profileSection += ` Cross-contact strictness: ${strictness}.`;
+  if (blocked.length > 0)
+    profileSection += ` They also cannot eat: ${blocked.join(", ")}.`;
+  if (restrictions.length > 0)
+    profileSection += ` Additional restrictions: ${restrictions.join(", ")}.`;
+  if (otherPrefs)
+    profileSection += ` Other preferences: ${otherPrefs}.`;
+
+  if (!hasCondition && blocked.length === 0 && restrictions.length === 0 && !otherPrefs) {
+    profileSection =
+      "The user has NOT specified any allergies, conditions, or dietary restrictions. Classify ALL items as Low Risk / safe unless the user's note says otherwise.";
+  }
+
+  return `You are a dietary safety assistant. Analyze this restaurant menu and classify every item based on the user's specific profile.
+
+USER PROFILE:
+${profileSection}
 ${note ? `\nExtra context from the user: "${note}"\n` : ""}
 RULES:
-1. Include every single item visible — food AND drinks. No section may be skipped, including Drinks, Beverages, and Cocktails.
-2. Be concise per item: desc in 5 words or fewer, ask in 6 words or fewer. Brevity is required so all items fit.
+1. Include every single item visible — food AND drinks. No section may be skipped.
+2. Be concise per item: desc in 5 words or fewer, ask in 6 words or fewer.
 3. Work section by section in menu order.
-4. Classify each item as exactly one of: "Low Risk", "Ask First", or "High Risk".
-   - Low Risk: naturally gluten-free (grilled meats, fish, rice, plain vegetables, most wines/spirits). Goes in safe[].
-   - Ask First: ambiguous — unknown sauces, shared fryers, tap drinks with unknown mixers. Goes in caution[].
-   - High Risk: definitively contains gluten — pasta, bread, pizza, sandwiches, wraps, breaded items, soy sauce, beer, malt beverages. Goes in caution[].
+4. Classify each item as exactly one of: "Low Risk", "Ask First", or "High Risk" — relative to THIS USER'S conditions and blocked ingredients.
+   - Low Risk: safe for this user given their specific conditions. Goes in safe[].
+   - Ask First: ambiguous for this user — might contain a trigger ingredient, cross-contact risk, unknown preparation. Goes in caution[].
+   - High Risk: definitively contains something this user must avoid. Goes in caution[].
+   - If the user has no conditions or restrictions, classify everything as "Low Risk".
 5. For every item:
    - desc: shortest possible ingredient list or menu description.
-   - ask: Low Risk → null. Ask First → one specific question. High Risk → the gluten source only.
+   - ask: Low Risk → null. Ask First → one specific question. High Risk → the trigger ingredient only.
 6. IDs must be unique integers starting from 1.
 
 SECTION HEADINGS:
-- If the menu has visible section headings (e.g. Appetizers, Salads, Mains), include a "menuOrder" array that lists items in the exact order they appear on the menu, with heading entries where headings appear.
+- If the menu has visible section headings, include a "menuOrder" array that lists items in exact menu order with heading entries.
 - If no section headings are visible, omit "menuOrder" entirely.
 
 Return ONLY valid JSON — no markdown fences, no extra text:
 {
   "restaurant": "name from menu, or 'Unknown Restaurant'",
   "cuisine": "cuisine type in 1–2 words",
-  "banner": "one sentence on how gluten-free friendly this menu is overall",
+  "banner": "one sentence on how friendly this menu is for this user's specific needs",
   "safe": [
     { "id": 1, "name": "exact name from menu", "price": "$XX or null", "desc": "description or key ingredients", "tag": "Low Risk", "ask": null }
   ],
   "caution": [
     { "id": 2, "name": "exact name from menu", "price": "$XX or null", "desc": "description or key ingredients", "tag": "Ask First", "ask": "specific question for the server" },
-    { "id": 3, "name": "exact name from menu", "price": "$XX or null", "desc": "description or key ingredients", "tag": "High Risk", "ask": "specific gluten source" }
+    { "id": 3, "name": "exact name from menu", "price": "$XX or null", "desc": "description or key ingredients", "tag": "High Risk", "ask": "specific trigger ingredient" }
   ],
   "menuOrder": [
     { "type": "heading", "text": "Appetizers" },
@@ -74,6 +110,15 @@ Return ONLY valid JSON — no markdown fences, no extra text:
     { "type": "item", "id": 3 }
   ]
 }`;
+}
+
+export const analyzeMenuPhotos = async (
+  photos: string[],
+  note: string,
+  profile?: ProfileContext,
+): Promise<AnalysisResult> => {
+  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  const prompt = buildAnalysisPrompt(note, profile);
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",

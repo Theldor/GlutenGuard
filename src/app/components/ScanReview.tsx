@@ -3,9 +3,12 @@ import { X, Plus, Loader2 } from "lucide-react";
 import { useState, useRef } from "react";
 import { BottomTabs } from "./BottomTabs";
 import { analyzeMenuPhotos, toDataURL } from "@/app/lib/analyzeMenu";
+import { useApp } from "../store";
+
 export function ScanReview() {
   const nav = useNavigate();
   const location = useLocation();
+  const { profile } = useApp();
   const [photos, setPhotos] = useState<string[]>(location.state?.photos || []);
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +32,14 @@ export function ScanReview() {
     setError(null);
     setLoading(true);
     try {
-      const results = await analyzeMenuPhotos(photos, note);
+      const results = await analyzeMenuPhotos(photos, note, {
+        condition: profile.condition,
+        customBlockedIngredients: profile.customBlockedIngredients,
+        additionalRestrictions: profile.additionalRestrictions,
+        symptomatic: profile.symptomatic,
+        crossContamination: profile.crossContamination,
+        otherDietaryPreferences: profile.otherDietaryPreferences,
+      });
       nav("/scan/results", { state: { results } });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong. Check your API key and try again.";
