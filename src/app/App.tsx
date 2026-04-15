@@ -8,7 +8,8 @@ function AutoRedirect() {
 
   useEffect(() => {
     // Only redirect from the root welcome screen, not mid-onboarding pages
-    if (onboardingComplete && window.location.pathname === "/") {
+    const hash = window.location.hash;
+    if (onboardingComplete && (hash === "" || hash === "#/")) {
       router.navigate("/scan", { replace: true });
     }
   }, [onboardingComplete]);

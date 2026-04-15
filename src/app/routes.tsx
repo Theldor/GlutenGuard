@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createHashRouter } from "react-router";
 import { OnboardingWelcome } from "./components/OnboardingWelcome";
 import { OnboardingQuestion } from "./components/OnboardingQuestion";
 import { OnboardingCard } from "./components/OnboardingCard";
@@ -15,7 +15,7 @@ import { TravelGuide } from "./components/TravelGuide";
 import { Profile } from "./components/Profile";
 import { ContactRestaurant } from "./components/ContactRestaurant";
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   { path: "/", Component: OnboardingWelcome },
   { path: "/onboarding/card", Component: OnboardingCard },
   { path: "/onboarding/:step", Component: OnboardingQuestion },
