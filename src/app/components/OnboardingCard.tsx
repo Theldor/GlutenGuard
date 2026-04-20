@@ -65,10 +65,23 @@ export function OnboardingCard() {
               Rice, corn, potatoes, vegetables, fruit, meat, fish, eggs, dairy, beans
             </p>
 
-            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 bg-[#fcf5e9] rounded-full">
-              <span className="text-[13px]">🇬🇧</span>
-              <span className="text-[13px] text-[#423424]">English</span>
-            </div>
+            {profile.spokenLanguages && (
+              <div className="mt-4">
+                <p className="text-[#100d09] text-[14px] mb-1" style={{ fontWeight: 500 }}>
+                  Languages I speak:
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {profile.spokenLanguages.split(", ").filter(Boolean).map((lang) => (
+                    <span
+                      key={lang}
+                      className="px-2.5 py-1 bg-[#fcf5e9] rounded-full text-[13px] text-[#423424]"
+                    >
+                      {lang}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

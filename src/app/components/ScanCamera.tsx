@@ -98,33 +98,6 @@ export function ScanCamera() {
 
     const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
     setPhotos((prev) => [...prev, dataUrl]);
-
-    canvas.toBlob(
-      (blob) => {
-        if (blob) saveToAlbum(blob, `menu-${Date.now()}.jpg`);
-      },
-      "image/jpeg",
-      0.92,
-    );
-  };
-
-  const saveToAlbum = async (blob: Blob, filename: string) => {
-    const file = new File([blob], filename, { type: "image/jpeg" });
-    if (
-      typeof navigator.canShare === "function" &&
-      navigator.canShare({ files: [file] })
-    ) {
-      try {
-        await navigator.share({ files: [file], title: "Menu photo" });
-        return;
-      } catch {
-        // User dismissed share sheet — photo is still captured in-app
-      }
-    }
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {

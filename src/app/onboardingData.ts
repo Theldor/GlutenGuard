@@ -1,3 +1,9 @@
+export const availableLanguages = [
+  "English", "Spanish", "French", "German", "Italian",
+  "Japanese", "Korean", "Chinese", "Portuguese", "Arabic",
+  "Russian", "Hindi", "Thai", "Vietnamese", "Dutch",
+];
+
 export const medicalConditions = [
   "I'd rather not say",
   "Celiac Disease",
@@ -29,6 +35,11 @@ export const medicalConditions = [
 ];
 
 export const questions = [
+  {
+    q: "What languages do you speak?",
+    key: "spokenLanguages" as const,
+    type: "language-select" as const,
+  },
   {
     q: "What's your name?",
     key: "name" as const,

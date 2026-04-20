@@ -310,7 +310,7 @@ export function ExploreMap() {
 
   return (
     <div className="flex flex-col h-full bg-white">
-      <div className="pt-4 pb-2">
+      <div className="px-4 pt-4 pb-2">
         {/* Header with avatar */}
         <div className="flex items-center justify-between mb-4 mt-4">
           <h1 className="text-[24px] font-semibold text-[#100d09]">Explore nearby</h1>

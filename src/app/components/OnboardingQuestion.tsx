@@ -1,7 +1,7 @@
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useApp } from "../store";
 import { ArrowLeft } from "lucide-react";
-import { medicalConditions, questions } from "../onboardingData";
+import { availableLanguages, medicalConditions, questions } from "../onboardingData";
 
 export function OnboardingQuestion() {
   const { step } = useParams();
@@ -17,8 +17,8 @@ export function OnboardingQuestion() {
 
   const isHelpingOther = profile.reason.includes(3);
   const questionText = data.q;
-  // Skip pronoun-swap on name (stepNum 0) and reason (stepNum 1); apply to later steps only.
-  const adjustedQuestion = isHelpingOther && stepNum > 1
+  // Skip pronoun-swap on languages (stepNum 0), name (stepNum 1), and reason (stepNum 2); apply to later steps only.
+  const adjustedQuestion = isHelpingOther && stepNum > 2
     ? questionText.replace("you", "they").replace("your", "their").replace("Are you", "Are they")
     : questionText;
 
@@ -42,6 +42,11 @@ export function OnboardingQuestion() {
     }
   };
 
+  const selectedLanguages = (profile.spokenLanguages ?? "")
+    .split(", ")
+    .map((l) => l.trim())
+    .filter(Boolean);
+
   const canContinue =
     data.type === "text"
       ? (profile.name ?? "").trim().length > 0
@@ -49,7 +54,16 @@ export function OnboardingQuestion() {
       ? profile.condition.length > 0
       : data.type === "checkbox"
       ? selectedArray.length > 0
+      : data.type === "language-select"
+      ? selectedLanguages.length > 0
       : (selected as number) >= 0;
+
+  const toggleLanguage = (lang: string) => {
+    const next = selectedLanguages.includes(lang)
+      ? selectedLanguages.filter((l) => l !== lang)
+      : [...selectedLanguages, lang];
+    setProfile({ spokenLanguages: next.join(", ") });
+  };
 
   const toggleCondition = (condition: string) => {
     const current = profile.condition;
@@ -98,6 +112,27 @@ export function OnboardingQuestion() {
             autoFocus
             className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] text-[16px] focus:border-[#525a3f] focus:outline-none placeholder:text-[#a4825b]"
           />
+        )}
+
+        {data.type === "language-select" && (
+          <div className="flex flex-wrap gap-2">
+            {availableLanguages.map((lang) => {
+              const isSelected = selectedLanguages.includes(lang);
+              return (
+                <button
+                  key={lang}
+                  onClick={() => toggleLanguage(lang)}
+                  className={`px-4 py-2 rounded-full border text-[15px] transition-all ${
+                    isSelected
+                      ? "border-[#525a3f] bg-[#f3f5f0] text-[#100d09]"
+                      : "border-[#dbcdbd] bg-white text-[#423424]"
+                  }`}
+                >
+                  {lang}
+                </button>
+              );
+            })}
+          </div>
         )}
 
         {data.type === "checkbox" && data.options?.map((opt, i) => {
