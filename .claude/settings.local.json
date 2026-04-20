@@ -17,7 +17,8 @@
       "Bash(Grep -n hash)",
       "Bash(Grep -n \"handleFileSelect\\\\|handleFiles\" /Users/theldor/Desktop/GlutenGuard/GlutenGuard/src/app/components/ScanCamera.tsx)",
       "Bash(git checkout:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(npx tsc *)"
     ]
   }
 }

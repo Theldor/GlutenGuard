@@ -30,7 +30,7 @@ export const toDataURL = (file: File): Promise<string> =>
   });
 
 export interface ProfileContext {
-  condition: string;
+  condition: string[];
   customBlockedIngredients: string[];
   additionalRestrictions: string[];
   symptomatic: number;
@@ -39,12 +39,12 @@ export interface ProfileContext {
 }
 
 function buildAnalysisPrompt(note: string, profile?: ProfileContext): string {
-  const hasCondition = profile?.condition && profile.condition.length > 0;
+  const hasCondition = !!profile?.condition && profile.condition.length > 0;
   const blocked = profile?.customBlockedIngredients ?? [];
   const restrictions = profile?.additionalRestrictions ?? [];
   const otherPrefs = profile?.otherDietaryPreferences ?? "";
 
-  const conditionLabel = hasCondition ? profile.condition : "celiac disease";
+  const conditionLabel = hasCondition ? profile!.condition.join(", ") : "celiac disease";
 
   const crossContactStrictness = ["not specified", "not concerned", "avoid if possible", "pretty strict", "very strict"];
   const strictness =

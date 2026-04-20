@@ -24,8 +24,8 @@ const CROSS_CONTACT_LABELS = [
 export function getProfileContextForAI(profile: UserProfile): string {
   const sections: string[] = [];
 
-  if (profile.condition)
-    sections.push(`Primary condition: ${profile.condition}`);
+  if (profile.condition.length > 0)
+    sections.push(`Primary condition: ${profile.condition.join(", ")}`);
 
   if (profile.reason.length > 0)
     sections.push(

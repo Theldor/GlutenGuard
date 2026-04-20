@@ -30,6 +30,12 @@ export const medicalConditions = [
 
 export const questions = [
   {
+    q: "What's your name?",
+    key: "name" as const,
+    type: "text" as const,
+    placeholder: "Enter your name",
+  },
+  {
     q: "What brought you here today?",
     key: "reason" as const,
     type: "checkbox" as const,
@@ -43,7 +49,7 @@ export const questions = [
   {
     q: "I'm gluten free because:",
     key: "condition" as const,
-    type: "dropdown" as const,
+    type: "multi-select" as const,
     textInputLabel: "Other dietary preferences",
     textInputKey: "otherDietaryPreferences" as const,
   },

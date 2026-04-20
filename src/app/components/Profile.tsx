@@ -61,18 +61,18 @@ export function Profile() {
     { icon: LogOut, label: "Sign Out", action: handleSignOut },
   ];
 
-  const sensitivityLabel = profile.condition || "Not set";
+  const sensitivityLabel = profile.condition.length > 0 ? profile.condition.join(", ") : "Not set";
+  const displayName = profile.name || "Your Name";
 
   return (
     <div className="flex flex-col h-full bg-white">
       <div className="flex-1 overflow-auto px-4 pt-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-16 h-16 rounded-full bg-[#525a3f] flex items-center justify-center text-white text-[24px]">
-            {profile.name[0]}
+          <div className="w-16 h-16 shrink-0 rounded-full bg-[#525a3f] flex items-center justify-center text-white text-[24px]">
+            {displayName[0]}
           </div>
-          <div>
-            <h2 className="text-[#100d09]">{profile.name}</h2>
-            <p className="text-[13px] text-[#846848]">Condition: {sensitivityLabel}</p>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[#100d09] truncate">{displayName}</h2>
           </div>
         </div>
 
@@ -115,11 +115,11 @@ export function Profile() {
               <div className="px-4 pb-4 border-t border-[#dbcdbd]">
                 {/* Primary condition — onboarding step 2 */}
                 <div className="bg-[#fcf5e9] border border-[#dbcdbd] rounded-2xl p-4 mb-3 mt-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <severityIcon.Icon size={20} className="shrink-0" style={{ color: severityIcon.color }} />
-                      <span className="text-[#100d09] text-[16px] truncate block" style={{ fontWeight: 600 }}>
-                        {profile.condition || "Not set"}
+                      <span className="text-[#100d09] text-[15px]" style={{ fontWeight: 600 }}>
+                        Primary conditions
                       </span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -132,12 +132,25 @@ export function Profile() {
                           {badge.label}
                         </div>
                       )}
-                      <button onClick={() => setEditStep(1)} className="p-1">
+                      <button onClick={() => setEditStep(2)} className="p-1">
                         <Edit2 size={16} className="text-[#423424]" />
                       </button>
                     </div>
                   </div>
-                  <p className="text-[13px] text-[#846848]">Primary condition</p>
+                  {profile.condition.length > 0 ? (
+                    <ul className="flex flex-wrap gap-1.5">
+                      {profile.condition.map((c) => (
+                        <li
+                          key={c}
+                          className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-[#dbcdbd] text-[13px] text-[#100d09]"
+                        >
+                          {c}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-[13px] text-[#846848]">Not set</p>
+                  )}
                 </div>
 
                 {/* Reaction severity — onboarding step 3 */}
@@ -149,13 +162,13 @@ export function Profile() {
                         {profile.symptomatic >= 0 ? symptomLabels[sympIdx] : "Not set"}
                       </p>
                     </div>
-                    <button onClick={() => setEditStep(2)} className="p-2">
+                    <button onClick={() => setEditStep(3)} className="p-2">
                       <Edit2 size={16} className="text-[#423424]" />
                     </button>
                   </div>
                 </div>
 
-                {/* Cross-contamination strictness — onboarding step 4 */}
+                {/* Cross-contamination strictness — onboarding step 5 */}
                 <div className="bg-[#fcf5e9] border border-[#dbcdbd] rounded-2xl p-4 mt-3">
                   <div className="flex items-center justify-between">
                     <div>
@@ -166,7 +179,7 @@ export function Profile() {
                           : "Not set"}
                       </p>
                     </div>
-                    <button onClick={() => setEditStep(3)} className="p-2">
+                    <button onClick={() => setEditStep(4)} className="p-2">
                       <Edit2 size={16} className="text-[#423424]" />
                     </button>
                   </div>
@@ -585,19 +598,62 @@ function OnboardingEditModal({
               </button>
             ))}
 
-          {data.type === "dropdown" && (
-            <select
-              value={localProfile.condition}
-              onChange={(e) => applyLocal({ condition: e.target.value })}
-              className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] focus:border-[#525a3f] focus:outline-none"
-            >
-              <option value="">Select a condition...</option>
-              {medicalConditions.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+          {data.type === "multi-select" &&
+            medicalConditions.map((c) => {
+              const isSelected = localProfile.condition.includes(c);
+              const isRatherNotSay = c === "I'd rather not say";
+              return (
+                <button
+                  key={c}
+                  onClick={() => {
+                    const current = localProfile.condition;
+                    if (current.includes(c)) {
+                      applyLocal({ condition: current.filter((v) => v !== c) });
+                    } else if (isRatherNotSay) {
+                      applyLocal({ condition: [c] });
+                    } else {
+                      applyLocal({
+                        condition: [...current.filter((v) => v !== "I'd rather not say"), c],
+                      });
+                    }
+                  }}
+                  className={`text-left p-4 rounded-lg border transition-all ${
+                    isSelected ? "border-[#525a3f] bg-[#f3f5f0]" : "border-[#dbcdbd] bg-white"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 ${
+                        isSelected ? "border-[#525a3f] bg-[#525a3f]" : "border-[#b79b7b]"
+                      }`}
+                    >
+                      {isSelected && (
+                        <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+                          <path
+                            d="M1 5L4.5 8.5L11 1.5"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <p className="text-[#100d09]">{c}</p>
+                  </div>
+                </button>
+              );
+            })}
+
+          {data.type === "text" && (
+            <input
+              type="text"
+              value={(localProfile.name ?? "")}
+              onChange={(e) => applyLocal({ name: e.target.value })}
+              placeholder={data.placeholder ?? ""}
+              autoFocus
+              className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] text-[16px] focus:border-[#525a3f] focus:outline-none placeholder:text-[#a4825b]"
+            />
           )}
 
           {data.textInputKey && (

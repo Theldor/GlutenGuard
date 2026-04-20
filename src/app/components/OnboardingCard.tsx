@@ -49,7 +49,9 @@ export function OnboardingCard() {
             </p>
 
             <p className="text-[#100d09] mb-3" style={{ fontWeight: 600 }}>
-              {profile.condition || "I have celiac disease"}
+              {profile.condition.length > 0
+                ? profile.condition.join(", ")
+                : "I have celiac disease"}
             </p>
             <p className="text-[#423424] text-[14px] mb-3">
               I cannot eat anything containing wheat, barley, rye, or oats.

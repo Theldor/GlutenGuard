@@ -167,7 +167,7 @@ export function ScanResults() {
   };
 
   const hasProfile =
-    !!profile.condition ||
+    profile.condition.length > 0 ||
     profile.customBlockedIngredients.length > 0 ||
     profile.additionalRestrictions.length > 0 ||
     !!profile.otherDietaryPreferences;

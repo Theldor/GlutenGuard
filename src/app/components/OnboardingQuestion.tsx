@@ -8,6 +8,8 @@ export function OnboardingQuestion() {
   const [searchParams] = useSearchParams();
   const fromProfile = searchParams.get("from") === "profile";
   const stepNum = parseInt(step || "1") - 1;
+  const totalSteps = questions.length;
+  const lastStep = totalSteps - 1;
   const nav = useNavigate();
   const { profile, setProfile } = useApp();
   const data = questions[stepNum];
@@ -15,7 +17,8 @@ export function OnboardingQuestion() {
 
   const isHelpingOther = profile.reason.includes(3);
   const questionText = data.q;
-  const adjustedQuestion = isHelpingOther && stepNum > 0
+  // Skip pronoun-swap on name (stepNum 0) and reason (stepNum 1); apply to later steps only.
+  const adjustedQuestion = isHelpingOther && stepNum > 1
     ? questionText.replace("you", "they").replace("your", "their").replace("Are you", "Are they")
     : questionText;
 
@@ -26,7 +29,7 @@ export function OnboardingQuestion() {
   const qs = fromProfile ? "?from=profile" : "";
 
   const next = () => {
-    if (stepNum < 3) nav(`/onboarding/${stepNum + 2}${qs}`);
+    if (stepNum < lastStep) nav(`/onboarding/${stepNum + 2}${qs}`);
     else if (fromProfile) nav("/profile");
     else nav("/onboarding/card");
   };
@@ -39,11 +42,28 @@ export function OnboardingQuestion() {
     }
   };
 
-  const canContinue = data.type === "dropdown"
-    ? profile.condition.length > 0
-    : data.type === "checkbox"
-    ? selectedArray.length > 0
-    : (selected as number) >= 0;
+  const canContinue =
+    data.type === "text"
+      ? (profile.name ?? "").trim().length > 0
+      : data.type === "multi-select"
+      ? profile.condition.length > 0
+      : data.type === "checkbox"
+      ? selectedArray.length > 0
+      : (selected as number) >= 0;
+
+  const toggleCondition = (condition: string) => {
+    const current = profile.condition;
+    const isRatherNotSay = condition === "I'd rather not say";
+    if (current.includes(condition)) {
+      setProfile({ condition: current.filter((c) => c !== condition) });
+    } else if (isRatherNotSay) {
+      setProfile({ condition: [condition] });
+    } else {
+      setProfile({
+        condition: [...current.filter((c) => c !== "I'd rather not say"), condition],
+      });
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white px-6 pt-6">
@@ -58,17 +78,28 @@ export function OnboardingQuestion() {
 
       {/* Progress */}
       <div className="flex gap-2 mb-8">
-        {[0, 1, 2, 3].map((i) => (
+        {questions.map((_, i) => (
           <div
             key={i}
             className={`h-1 flex-1 rounded-full ${i <= stepNum ? "bg-[#525a3f]" : "bg-[#dbcdbd]"}`}
           />
         ))}
       </div>
-      <p className="text-[#846848] mb-1">Step {stepNum + 1} of 4</p>
+      <p className="text-[#846848] mb-1">Step {stepNum + 1} of {totalSteps}</p>
       <h2 className="text-[#100d09] mb-6">{adjustedQuestion}</h2>
 
       <div className="flex-1 overflow-auto flex flex-col gap-2">
+        {data.type === "text" && (
+          <input
+            type="text"
+            value={profile.name}
+            onChange={(e) => setProfile({ name: e.target.value })}
+            placeholder={data.placeholder ?? ""}
+            autoFocus
+            className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] text-[16px] focus:border-[#525a3f] focus:outline-none placeholder:text-[#a4825b]"
+          />
+        )}
+
         {data.type === "checkbox" && data.options?.map((opt, i) => {
           const isSelected = selectedArray.includes(i);
           return (
@@ -143,22 +174,35 @@ export function OnboardingQuestion() {
           </button>
         ))}
 
-        {data.type === "dropdown" && (
-          <>
-            <select
-              value={profile.condition}
-              onChange={(e) => setProfile({ condition: e.target.value })}
-              className="w-full p-4 rounded-lg border border-[#dbcdbd] bg-white text-[#100d09] focus:border-[#525a3f] focus:outline-none"
+        {data.type === "multi-select" && medicalConditions.map((condition) => {
+          const isSelected = profile.condition.includes(condition);
+          return (
+            <button
+              key={condition}
+              onClick={() => toggleCondition(condition)}
+              className={`text-left p-4 rounded-lg border transition-all ${
+                isSelected
+                  ? "border-[#525a3f] bg-[#f3f5f0]"
+                  : "border-[#dbcdbd] bg-white"
+              }`}
             >
-              <option value="">Select a condition...</option>
-              {medicalConditions.map((condition) => (
-                <option key={condition} value={condition}>
-                  {condition}
-                </option>
-              ))}
-            </select>
-          </>
-        )}
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 ${
+                    isSelected ? "border-[#525a3f] bg-[#525a3f]" : "border-[#b79b7b]"
+                  }`}
+                >
+                  {isSelected && (
+                    <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+                      <path d="M1 5L4.5 8.5L11 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </div>
+                <p className="text-[#100d09]">{condition}</p>
+              </div>
+            </button>
+          );
+        })}
 
         {data.textInputKey && (
           <div className="mt-4">
@@ -181,11 +225,13 @@ export function OnboardingQuestion() {
           disabled={!canContinue}
           className="w-full py-3.5 bg-[#525a3f] text-white rounded-lg disabled:opacity-40"
         >
-          {fromProfile && stepNum === 3 ? "Save & Return" : "Continue"}
+          {fromProfile && stepNum === lastStep ? "Save & Return" : "Continue"}
         </button>
-        <button onClick={next} className="w-full py-3 text-[#525a3f] bg-transparent">
-          Skip
-        </button>
+        {data.type !== "text" && (
+          <button onClick={next} className="w-full py-3 text-[#525a3f] bg-transparent">
+            Skip
+          </button>
+        )}
       </div>
     </div>
   );

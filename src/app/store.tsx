@@ -13,7 +13,7 @@ export interface CardSection {
 export interface UserProfile {
   name: string;
   reason: number[];
-  condition: string;
+  condition: string[];
   otherDietaryPreferences: string;
   symptomatic: number;
   symptomNotes: string;
@@ -62,9 +62,9 @@ const ACCOUNT_SNAPSHOT_KEY = "glutenguard_account_snapshot";
 const SCAN_HISTORY_KEY = "glutenguard_scan_history";
 
 const DEFAULT_PROFILE: UserProfile = {
-  name: "Your Name",
+  name: "",
   reason: [],
-  condition: "",
+  condition: [],
   otherDietaryPreferences: "",
   symptomatic: -1,
   symptomNotes: "",
@@ -82,13 +82,26 @@ interface PersistedState {
   trips: Trip[];
 }
 
+function migrateProfile(raw: unknown): UserProfile {
+  const p = { ...DEFAULT_PROFILE, ...(raw as Partial<UserProfile> ?? {}) } as UserProfile;
+  const legacyCondition = (raw as { condition?: unknown })?.condition;
+  if (typeof legacyCondition === "string") {
+    p.condition = legacyCondition ? [legacyCondition] : [];
+  } else if (Array.isArray(legacyCondition)) {
+    p.condition = legacyCondition.filter((c): c is string => typeof c === "string");
+  } else {
+    p.condition = [];
+  }
+  return p;
+}
+
 function loadState(): PersistedState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<PersistedState>;
       return {
-        profile: { ...DEFAULT_PROFILE, ...(parsed.profile ?? {}) },
+        profile: migrateProfile(parsed.profile),
         onboardingComplete: parsed.onboardingComplete ?? false,
         cardLanguage: parsed.cardLanguage ?? "en",
         trips: parsed.trips ?? [],
@@ -119,7 +132,7 @@ function loadAccountSnapshot(): PersistedState | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<PersistedState>;
     return {
-      profile: { ...DEFAULT_PROFILE, ...(parsed.profile ?? {}) },
+      profile: migrateProfile(parsed.profile),
       onboardingComplete: parsed.onboardingComplete ?? true,
       cardLanguage: parsed.cardLanguage ?? "en",
       trips: parsed.trips ?? [],
