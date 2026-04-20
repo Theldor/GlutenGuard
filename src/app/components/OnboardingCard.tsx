@@ -75,7 +75,7 @@ export function OnboardingCard() {
         <button
           onClick={() => {
             setOnboardingComplete(true);
-            nav("/scan");
+            nav("/explore", { state: { view: "list" } });
           }}
           className="w-full py-3.5 bg-[#525a3f] text-white rounded-lg"
         >

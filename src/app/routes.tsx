@@ -15,6 +15,7 @@ import { TravelGuide } from "./components/TravelGuide";
 import { Profile } from "./components/Profile";
 import { ContactRestaurant } from "./components/ContactRestaurant";
 import { ScanHistory } from "./components/ScanHistory";
+import { HelpAndSupport } from "./components/HelpAndSupport";
 
 export const router = createHashRouter([
   { path: "/", Component: OnboardingWelcome },
@@ -32,5 +33,6 @@ export const router = createHashRouter([
   { path: "/explore/contact", Component: ContactRestaurant },
   { path: "/travel", Component: TravelGuide },
   { path: "/profile", Component: Profile },
+  { path: "/profile/help", Component: HelpAndSupport },
   { path: "/scan/history", Component: ScanHistory },
 ]);

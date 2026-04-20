@@ -57,7 +57,7 @@ export function Profile() {
   };
 
   const menuItems = [
-    { icon: HelpCircle, label: "Help & Support", action: () => {} },
+    { icon: HelpCircle, label: "Help & Support", action: () => nav("/profile/help") },
     { icon: LogOut, label: "Sign Out", action: handleSignOut },
   ];
 

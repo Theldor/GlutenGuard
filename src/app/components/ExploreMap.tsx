@@ -1,9 +1,49 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { Search, List, MapIcon, Star, Clock, Heart, ChevronRight, Bookmark, MapPin } from "lucide-react";
+import { useNavigate, useLocation } from "react-router";
+import { Search, List, MapIcon, Star, Clock, Heart, ChevronRight, Bookmark } from "lucide-react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import L from "leaflet";
 import { BottomTabs } from "./BottomTabs";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useApp } from "../store";
+
+function createRestaurantIcon(type: "green" | "yellow" | "gray", selected: boolean) {
+  const color = pinColors[type];
+  const size = selected ? 40 : 32;
+  const outerShadow = selected
+    ? "0 0 0 4px #525a3f, 0 4px 12px rgba(0,0,0,0.4)"
+    : "0 2px 8px rgba(0,0,0,0.3)";
+  return L.divIcon({
+    className: "",
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:3px solid white;box-shadow:${outerShadow};"></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+}
+
+const userLocationIcon = L.divIcon({
+  className: "",
+  html: `<div style="width:16px;height:16px;border-radius:50%;background:#2563eb;border:2px solid white;box-shadow:0 0 0 6px rgba(37,99,235,0.25);"></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+});
+
+function RecenterOnUser({ location }: { location: [number, number] | null }) {
+  const map = useMap();
+  useEffect(() => {
+    if (location) map.flyTo(location, 14, { duration: 0.8 });
+  }, [location, map]);
+  return null;
+}
+
+function InvalidateSizeOnMount() {
+  const map = useMap();
+  useEffect(() => {
+    const id = window.setTimeout(() => map.invalidateSize(), 0);
+    return () => window.clearTimeout(id);
+  }, [map]);
+  return null;
+}
 
 const filters = ["All", "Celiac-Appropriate", "GF Menu", "Near Me", "Good for Groups", "Top Rated", "Open Now"];
 const cuisineFilters = ["All Cuisines", "Italian", "Café", "Pizza", "Asian", "American"];
@@ -206,125 +246,34 @@ const pinColors: Record<string, string> = {
 
 export function ExploreMap() {
   const nav = useNavigate();
+  const location = useLocation();
   const { profile } = useApp();
-  const [center, setCenter] = useState<[number, number]>([DEFAULT_CENTER.lat, DEFAULT_CENTER.lng]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selected, setSelected] = useState(0);
   const [activeFilter, setActiveFilter] = useState(0);
   const [activeCuisine, setActiveCuisine] = useState(0);
-  const [showList, setShowList] = useState(false);
+  const [showList, setShowList] = useState(
+    (location.state as { view?: string } | null)?.view === "list"
+  );
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [saved, setSaved] = useState<Set<number>>(new Set());
-  const [sortBy, setSortBy] = useState<"rating" | "distance" | "safeItems">("rating");
-  
-  // Pan state
-  const [panOffset, setPanOffset] = useState<[number, number]>([0, 0]);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState<[number, number]>([0, 0]);
-  const [zoom, setZoom] = useState(1);
-  
-  // Pinch zoom state for touch
-  const [lastPinchDistance, setLastPinchDistance] = useState<number | null>(null);
+  const [sortBy] = useState<"rating" | "distance" | "safeItems">("rating");
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   useEffect(() => {
-    // Try to get user location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          console.log("User location:", lat, lon);
-          // Don't change center - keep showing SF restaurants
-        },
-        (error) => {
-          console.log("Location permission denied or unavailable, using default SF location");
-        }
-      );
-    } else {
-      console.log("Geolocation not supported, using default SF location");
-    }
-    
-    // Use mock data
     setRestaurants(MOCK_RESTAURANTS);
-  }, []);
-  
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStart([e.clientX - panOffset[0], e.clientY - panOffset[1]]);
-  };
-  
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setPanOffset([e.clientX - dragStart[0], e.clientY - dragStart[1]]);
-  };
-  
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-  
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      // Pinch zoom starting
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      );
-      setLastPinchDistance(distance);
-      setIsDragging(false);
-    } else if (e.touches.length === 1) {
-      // Single touch for panning
-      const touch = e.touches[0];
-      setIsDragging(true);
-      setDragStart([touch.clientX - panOffset[0], touch.clientY - panOffset[1]]);
-    }
-  };
-  
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (e.touches.length === 2) {
-      // Pinch zoom
-      e.preventDefault();
-      const touch1 = e.touches[0];
-      const touch2 = e.touches[1];
-      const distance = Math.hypot(
-        touch2.clientX - touch1.clientX,
-        touch2.clientY - touch1.clientY
-      );
-      
-      if (lastPinchDistance !== null) {
-        const delta = distance - lastPinchDistance;
-        const zoomFactor = 1 + delta * 0.01;
-        setZoom((prevZoom) => Math.max(0.5, Math.min(3, prevZoom * zoomFactor)));
-      }
-      
-      setLastPinchDistance(distance);
-    } else if (e.touches.length === 1 && isDragging) {
-      // Single touch panning
-      const touch = e.touches[0];
-      setPanOffset([touch.clientX - dragStart[0], touch.clientY - dragStart[1]]);
-    }
-  };
-  
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    setLastPinchDistance(null);
-  };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    
-    // Check if it's a pinch gesture on trackpad (ctrlKey is set for pinch)
-    if (e.ctrlKey) {
-      // Trackpad pinch zoom
-      const zoomFactor = 1 - e.deltaY * 0.01;
-      setZoom((prevZoom) => Math.max(0.5, Math.min(3, prevZoom * zoomFactor)));
-    } else {
-      // Regular scroll wheel zoom
-      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-      setZoom((prevZoom) => Math.max(0.5, Math.min(3, prevZoom * zoomFactor)));
-    }
-  };
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation([position.coords.latitude, position.coords.longitude]);
+      },
+      () => {
+        // Permission denied or unavailable — fall back to DEFAULT_CENTER (SF).
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, []);
 
   const toggleFavorite = (i: number) => {
     setFavorites((prev) => {
@@ -359,15 +308,9 @@ export function ExploreMap() {
 
   const pin = restaurants[selected];
 
-  // Calculate map bounds for pins
-  const mapWidth = 430; // max-width of container
-  const mapHeight = 500; // approximate height
-  const latRange = 0.035; // ~2.5 miles
-  const lonRange = 0.05;
-
   return (
     <div className="flex flex-col h-full bg-white">
-      <div className="px-4 pt-4 pb-2">
+      <div className="pt-4 pb-2">
         {/* Header with avatar */}
         <div className="flex items-center justify-between mb-4 mt-4">
           <h1 className="text-[24px] font-semibold text-[#100d09]">Explore nearby</h1>
@@ -426,37 +369,24 @@ export function ExploreMap() {
         </div>
       </div>
 
-      {/* Map/List toggle button - conditional positioning */}
-      {showList ? (
-        // In list view: relative positioning inside the scrollable container
-        null
-      ) : (
-        // In map view: fixed positioning that doesn't scroll
-        <button
-          onClick={() => setShowList(!showList)}
-          className="fixed top-[210px] right-4 z-[1001] bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#100d09] pointer-events-auto"
-          style={{ fontWeight: 500 }}
-        >
-          <List size={16} /> List
-        </button>
-      )}
-
       {showList ? (
         /* ==================== LIST VIEW ==================== */
-        <div className="flex-1 relative overflow-auto">
+        <div className="flex-1 relative overflow-hidden">
+          <button
+            onClick={() => setShowList(false)}
+            className="absolute top-3 right-3 z-[1001] bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#100d09]"
+            style={{ fontWeight: 500 }}
+          >
+            <MapIcon size={16} /> Map
+          </button>
+
+          <div className="absolute inset-0 overflow-y-auto">
           {/* Spacing after filter bars */}
           <div className="h-2" />
 
-          {/* Restaurant count with toggle button on same line */}
-          <div className="px-4 pb-2 flex items-center justify-between">
+          {/* Restaurant count */}
+          <div className="px-4 pb-2 pr-28 flex items-center">
             <p className="text-[13px] text-[#846848]">{filteredRestaurants.length} restaurants</p>
-            <button
-              onClick={() => setShowList(false)}
-              className="bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#100d09]"
-              style={{ fontWeight: 500 }}
-            >
-              <MapIcon size={16} /> Map
-            </button>
           </div>
 
           {/* Featured / promoted card */}
@@ -628,107 +558,48 @@ export function ExploreMap() {
 
           {/* End spacer */}
           <div className="h-4" />
+          </div>
         </div>
       ) : (
         /* ==================== MAP VIEW ==================== */
-        <div 
-          className="flex-1 relative overflow-hidden select-none"
-          style={{ 
-            cursor: isDragging ? 'grabbing' : 'grab',
-            touchAction: 'none'
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onWheel={handleWheel}
-        >
-          {/* Removed duplicate toggle button - using the fixed one above */}
-          
-          {/* Draggable map container */}
-          <div 
-            className="absolute"
-            style={{
-              width: '300%',
-              height: '300%',
-              left: '50%',
-              top: '50%',
-              transform: `translate(calc(-50% + ${panOffset[0]}px), calc(-50% + ${panOffset[1]}px)) scale(${zoom})`,
-              backgroundImage: `
-                linear-gradient(0deg, #d0e8f0 1px, transparent 1px),
-                linear-gradient(90deg, #d0e8f0 1px, transparent 1px)
-              `,
-              backgroundSize: '40px 40px',
-              backgroundColor: '#e8f4f8',
-            }}
+        <div className="flex-1 relative overflow-hidden">
+          <button
+            onClick={() => setShowList(true)}
+            className="absolute top-3 right-3 z-[1001] bg-white rounded-lg px-3 py-2 shadow-md flex items-center gap-1.5 text-[13px] text-[#100d09]"
+            style={{ fontWeight: 500 }}
           >
-            {/* Streets overlay - more visible */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.3 }}>
-              <defs>
-                <pattern id="streets" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
-                  <line x1="0" y1="100" x2="200" y2="100" stroke="#8ab4c6" strokeWidth="3" />
-                  <line x1="100" y1="0" x2="100" y2="200" stroke="#8ab4c6" strokeWidth="3" />
-                  <line x1="0" y1="50" x2="200" y2="50" stroke="#b0ccd8" strokeWidth="1.5" />
-                  <line x1="0" y1="150" x2="200" y2="150" stroke="#b0ccd8" strokeWidth="1.5" />
-                  <line x1="50" y1="0" x2="50" y2="200" stroke="#b0ccd8" strokeWidth="1.5" />
-                  <line x1="150" y1="0" x2="150" y2="200" stroke="#b0ccd8" strokeWidth="1.5" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#streets)" />
-            </svg>
-            
-            {/* Map pins - positioned absolutely with counter-scaling */}
-            {restaurants.length > 0 && restaurants.map((restaurant, i) => {
-              // Calculate position in the center of our oversized map
-              const baseX = 50; // center horizontally in %
-              const baseY = 50; // center vertically in %
-              
-              // Offset from center based on lat/lon
-              const layoutCenter = [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng];
-              const lonDiff = restaurant.lon - layoutCenter[1];
-              const latDiff = restaurant.lat - layoutCenter[0];
-              
-              // Convert to percentage offsets (each 0.01 degree ≈ 3.33% of our view)
-              const x = baseX + (lonDiff * 200);
-              const y = baseY - (latDiff * 200);
-              
-              const isSelected = i === selected;
-              
-              return (
-                <button
-                  key={restaurant.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelected(i);
-                  }}
-                  className="absolute transition-all z-10"
-                  style={{
-                    left: `${x}%`,
-                    top: `${y}%`,
-                    transform: `translate(-50%, -50%) scale(${1 / zoom})`,
-                    transformOrigin: 'center center',
-                    width: isSelected ? '40px' : '32px',
-                    height: isSelected ? '40px' : '32px',
-                  }}
-                >
-                  <div
-                    className="w-full h-full rounded-full border-3 border-white shadow-lg transition-all flex items-center justify-center"
-                    style={{
-                      backgroundColor: pinColors[restaurant.type],
-                      boxShadow: isSelected ? '0 0 0 4px #525a3f, 0 4px 12px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.3)',
-                    }}
-                  >
-                    {isSelected && (
-                      <MapPin size={20} className="text-white" fill="white" />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+            <List size={16} /> List
+          </button>
+
+          <MapContainer
+            center={[DEFAULT_CENTER.lat, DEFAULT_CENTER.lng]}
+            zoom={14}
+            zoomControl={false}
+            className="absolute inset-0"
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+
+            <InvalidateSizeOnMount />
+            <RecenterOnUser location={userLocation} />
+
+            {userLocation && (
+              <Marker position={userLocation} icon={userLocationIcon} />
+            )}
+
+            {restaurants.map((restaurant, i) => (
+              <Marker
+                key={restaurant.id}
+                position={[restaurant.lat, restaurant.lon]}
+                icon={createRestaurantIcon(restaurant.type, i === selected)}
+                eventHandlers={{
+                  click: () => setSelected(i),
+                }}
+              />
+            ))}
+          </MapContainer>
 
           {/* Restaurant info card at bottom */}
           {pin && (
